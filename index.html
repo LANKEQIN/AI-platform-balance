@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI平台余额快捷入口</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 页面头部 -->
+    <header class="header">
+        <h1 class="header-title">AI平台余额快捷入口</h1>
+        <div class="header-actions">
+            <input type="text" class="search-input" placeholder="搜索平台..." id="searchInput">
+            <button class="btn btn-secondary" id="addPlatformBtn">+ 添加平台</button>
+            <button class="btn btn-icon" id="themeToggle" title="切换主题">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 平台卡片容器 -->
+        <div class="platform-grid" id="platformGrid">
+            <!-- 平台卡片将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 空状态提示 -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <p>暂无平台数据</p>
+            <button class="btn btn-primary" id="addFirstPlatformBtn">添加第一个平台</button>
+        </div>
+    </main>
+
+    <!-- 编辑弹窗 -->
+    <div class="modal" id="editModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">编辑平台</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editName">平台名称</label>
+                    <input type="text" id="editName" class="form-input" placeholder="请输入平台名称">
+                </div>
+                <div class="form-group">
+                    <label for="editUrl">余额页面链接</label>
+                    <input type="url" id="editUrl" class="form-input" placeholder="请输入余额页面链接">
+                    <p class="form-hint" id="editUrlHint" style="display: none;">默认链接: <span></span></p>
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">分类</label>
+                    <select id="editCategory" class="form-select">
+                        <option value="大模型">大模型</option>
+                        <option value="图像生成">图像生成</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalReset" style="display: none;">恢复默认链接</button>
+                <button class="btn btn-secondary" id="modalCancel">取消</button>
+                <button class="btn btn-danger" id="modalDelete">删除</button>
+                <button class="btn btn-primary" id="modalSave">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加平台弹窗 -->
+    <div class="modal" id="addModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">添加平台</h2>
+                <button class="modal-close" id="addModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="addName">平台名称 <span class="required">*</span></label>
+                    <input type="text" id="addName" class="form-input" placeholder="请输入平台名称">
+                </div>
+                <div class="form-group">
+                    <label for="addUrl">余额页面链接 <span class="required">*</span></label>
+                    <input type="url" id="addUrl" class="form-input" placeholder="请输入余额页面链接">
+                </div>
+                <div class="form-group">
+                    <label for="addCategory">分类</label>
+                    <select id="addCategory" class="form-select">
+                        <option value="大模型">大模型</option>
+                        <option value="图像生成">图像生成</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="addModalCancel">取消</button>
+                <button class="btn btn-primary" id="addModalSave">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>数据存储在本地浏览器中，清除浏览器数据会导致配置丢失</p>
+    </footer>
+
+    <!-- JavaScript文件引入 -->
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
