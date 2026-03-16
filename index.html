@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="快速访问各AI平台的余额页面">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
     <title>AI平台余额快捷入口</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -11,13 +15,44 @@
     <header class="header">
         <h1 class="header-title">AI平台余额快捷入口</h1>
         <div class="header-actions">
-            <input type="text" class="search-input" placeholder="搜索平台..." id="searchInput">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="搜索平台... (Ctrl+K)" id="searchInput">
+                <button class="search-clear" id="searchClear" title="清空搜索">×</button>
+            </div>
             <button class="btn btn-secondary" id="addPlatformBtn">+ 添加平台</button>
+            <div class="dropdown">
+                <button class="btn btn-icon" id="moreBtn" title="更多操作">
+                    <span>⋮</span>
+                </button>
+                <div class="dropdown-menu" id="moreMenu">
+                    <button class="dropdown-item" id="exportBtn">📤 导出配置</button>
+                    <button class="dropdown-item" id="importBtn">📥 导入配置</button>
+                    <button class="dropdown-item" id="resetBtn">🔄 重置配置</button>
+                </div>
+            </div>
             <button class="btn btn-icon" id="themeToggle" title="切换主题">
                 <span class="theme-icon">🌙</span>
             </button>
         </div>
     </header>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+        <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-category="all">全部</button>
+            <button class="filter-tab" data-category="大模型">大模型</button>
+            <button class="filter-tab" data-category="图像生成">图像生成</button>
+            <button class="filter-tab" data-category="其他">其他</button>
+            <button class="filter-tab" data-category="starred">⭐ 已收藏</button>
+        </div>
+        <div class="view-toggle">
+            <button class="view-btn active" data-view="grid" title="卡片视图">▦</button>
+            <button class="view-btn" data-view="list" title="列表视图">☰</button>
+        </div>
+    </div>
+
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="importFile" accept=".json" style="display: none;">
 
     <!-- 主内容区域 -->
     <main class="main-content">
@@ -28,10 +63,15 @@
 
         <!-- 空状态提示 -->
         <div class="empty-state" id="emptyState" style="display: none;">
-            <p>暂无平台数据</p>
-            <button class="btn btn-primary" id="addFirstPlatformBtn">添加第一个平台</button>
+            <div class="empty-icon">📭</div>
+            <p class="empty-title">暂无平台数据</p>
+            <p class="empty-desc">点击下方按钮添加你的第一个AI平台</p>
+            <button class="btn btn-primary" id="addFirstPlatformBtn">+ 添加第一个平台</button>
         </div>
     </main>
+
+    <!-- Toast 容器 -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <!-- 编辑弹窗 -->
     <div class="modal" id="editModal">
@@ -58,6 +98,13 @@
                         <option value="图像生成">图像生成</option>
                         <option value="其他">其他</option>
                     </select>
+                </div>
+                <div class="form-group form-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="editStarred">
+                        <span class="checkbox-custom"></span>
+                        <span>收藏此平台</span>
+                    </label>
                 </div>
             </div>
             <div class="modal-footer">
@@ -111,5 +158,20 @@
     <script src="js/config.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Service Worker 注册 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

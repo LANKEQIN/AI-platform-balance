@@ -82,7 +82,8 @@ const CATEGORIES = [
 const STORAGE_KEYS = {
     PLATFORMS_CONFIG: 'ai_platforms_config',
     THEME: 'ai_platforms_theme',
-    CONFIG_VERSION: 'ai_platforms_config_version'
+    CONFIG_VERSION: 'ai_platforms_config_version',
+    VIEW_MODE: 'ai_platforms_view_mode'
 };
 
 // 配置版本号 - 修改平台列表时递增此版本号

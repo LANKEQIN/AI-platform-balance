@@ -146,5 +146,61 @@ const StorageManager = {
         localStorage.removeItem(STORAGE_KEYS.PLATFORMS_CONFIG);
         localStorage.setItem(STORAGE_KEYS.CONFIG_VERSION, String(CONFIG_VERSION));
         return JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
+    },
+
+    /**
+     * 获取视图模式
+     * @returns {string} 视图模式 ('grid' 或 'list')
+     */
+    getViewMode: function() {
+        return localStorage.getItem(STORAGE_KEYS.VIEW_MODE) || 'grid';
+    },
+
+    /**
+     * 保存视图模式
+     * @param {string} mode 视图模式
+     */
+    saveViewMode: function(mode) {
+        localStorage.setItem(STORAGE_KEYS.VIEW_MODE, mode);
+    },
+
+    /**
+     * 导出配置为JSON字符串
+     * @returns {string} JSON字符串
+     */
+    exportConfig: function() {
+        const config = {
+            platforms: this.getPlatforms(),
+            theme: this.getTheme(),
+            viewMode: this.getViewMode(),
+            exportTime: new Date().toISOString(),
+            version: CONFIG_VERSION
+        };
+        return JSON.stringify(config, null, 2);
+    },
+
+    /**
+     * 导入配置
+     * @param {string} jsonString JSON字符串
+     * @returns {boolean} 是否成功
+     */
+    importConfig: function(jsonString) {
+        try {
+            const config = JSON.parse(jsonString);
+            if (config.platforms && Array.isArray(config.platforms)) {
+                this.savePlatforms(config.platforms);
+                if (config.theme) {
+                    this.saveTheme(config.theme);
+                }
+                if (config.viewMode) {
+                    this.saveViewMode(config.viewMode);
+                }
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('导入配置失败:', error);
+            return false;
+        }
     }
 };
