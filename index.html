@@ -33,6 +33,9 @@
             <button class="btn btn-icon" id="themeToggle" title="切换主题">
                 <span class="theme-icon">🌙</span>
             </button>
+            <button class="btn btn-icon" id="effectsToggle" title="切换特效模式">
+                <span class="effects-icon">⚡</span>
+            </button>
         </div>
     </header>
 
@@ -40,9 +43,8 @@
     <div class="toolbar">
         <div class="filter-tabs" id="filterTabs">
             <button class="filter-tab active" data-category="all">全部</button>
-            <button class="filter-tab" data-category="大模型">大模型</button>
-            <button class="filter-tab" data-category="图像生成">图像生成</button>
-            <button class="filter-tab" data-category="其他">其他</button>
+            <!-- 动态生成分类标签 -->
+            <div id="categoryTabsContainer"></div>
             <button class="filter-tab" data-category="starred">⭐ 已收藏</button>
         </div>
         <div class="view-toggle">
@@ -94,9 +96,7 @@
                 <div class="form-group">
                     <label for="editCategory">分类</label>
                     <select id="editCategory" class="form-select">
-                        <option value="大模型">大模型</option>
-                        <option value="图像生成">图像生成</option>
-                        <option value="其他">其他</option>
+                        <!-- 动态生成选项 -->
                     </select>
                 </div>
                 <div class="form-group form-checkbox">
@@ -136,9 +136,7 @@
                 <div class="form-group">
                     <label for="addCategory">分类</label>
                     <select id="addCategory" class="form-select">
-                        <option value="大模型">大模型</option>
-                        <option value="图像生成">图像生成</option>
-                        <option value="其他">其他</option>
+                        <!-- 动态生成选项 -->
                     </select>
                 </div>
             </div>

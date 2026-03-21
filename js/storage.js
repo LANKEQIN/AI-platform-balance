@@ -165,6 +165,22 @@ const StorageManager = {
     },
 
     /**
+     * 获取特效模式
+     * @returns {string} 特效模式 ('cool' 狂拽酷炫费电 或 'simple' 小清新省电)
+     */
+    getEffectsMode: function() {
+        return localStorage.getItem(STORAGE_KEYS.EFFECTS_MODE) || 'cool';
+    },
+
+    /**
+     * 保存特效模式
+     * @param {string} mode 特效模式
+     */
+    saveEffectsMode: function(mode) {
+        localStorage.setItem(STORAGE_KEYS.EFFECTS_MODE, mode);
+    },
+
+    /**
      * 导出配置为JSON字符串
      * @returns {string} JSON字符串
      */

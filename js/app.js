@@ -149,6 +149,12 @@ function initApp() {
     // 初始化视图模式
     initViewMode();
 
+    // 初始化特效模式
+    initEffectsMode();
+
+    // 渲染分类标签
+    renderCategoryTabs();
+
     // 渲染平台卡片
     renderPlatforms();
 
@@ -168,6 +174,71 @@ function initTheme() {
         document.documentElement.setAttribute('data-theme', 'dark');
         updateThemeIcon(true);
     }
+}
+
+/**
+ * 初始化特效模式
+ */
+function initEffectsMode() {
+    const savedMode = StorageManager.getEffectsMode();
+    updateEffectsIcon(savedMode);
+}
+
+/**
+ * 渲染分类标签
+ * 从CATEGORIES配置动态生成分类标签
+ */
+function renderCategoryTabs() {
+    const container = document.getElementById('categoryTabsContainer');
+    if (!container) return;
+
+    container.innerHTML = CATEGORIES.map(cat =>
+        `<button class="filter-tab" data-category="${cat.id}">${cat.name}</button>`
+    ).join('');
+
+    renderCategorySelects();
+}
+
+/**
+ * 渲染分类下拉选项
+ * 为编辑和添加弹窗的select元素动态生成选项
+ */
+function renderCategorySelects() {
+    const editSelect = document.getElementById('editCategory');
+    const addSelect = document.getElementById('addCategory');
+
+    const optionsHtml = CATEGORIES.map(cat =>
+        `<option value="${cat.id}">${cat.name}</option>`
+    ).join('');
+
+    if (editSelect) editSelect.innerHTML = optionsHtml;
+    if (addSelect) addSelect.innerHTML = optionsHtml;
+}
+
+/**
+ * 更新特效模式图标
+ * @param {string} mode 特效模式
+ */
+function updateEffectsIcon(mode) {
+    const effectsIcon = document.querySelector('.effects-icon');
+    if (effectsIcon) {
+        effectsIcon.textContent = mode === 'cool' ? '⚡' : '💡';
+    }
+}
+
+/**
+ * 切换特效模式
+ */
+function toggleEffects() {
+    const currentMode = StorageManager.getEffectsMode();
+    const newMode = currentMode === 'cool' ? 'simple' : 'cool';
+
+    StorageManager.saveEffectsMode(newMode);
+    VisualEffects.setMode(newMode);
+    updateEffectsIcon(newMode);
+
+    const message = newMode === 'cool' ? '已开启狂拽酷炫特效模式 ⚡' : '已切换到省电小清新模式 💡';
+    ToastManager.show(message, 'info');
 }
 
 /**
@@ -307,6 +378,9 @@ function bindEvents() {
 
     // 主题切换
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+    // 特效模式切换
+    document.getElementById('effectsToggle').addEventListener('click', toggleEffects);
 
     // 添加平台按钮
     document.getElementById('addPlatformBtn').addEventListener('click', openAddModal);

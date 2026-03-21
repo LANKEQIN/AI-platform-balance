@@ -1,23 +1,33 @@
 /**
  * 炫酷视觉效果管理器
  * 包含粒子背景、鼠标追踪光效、卡片3D效果等
+ * 已优化：解决性能卡顿问题
  */
 
 const VisualEffects = {
     particlesContainer: null,
     cursorGlow: null,
-    particleCount: 50,
+    particleCount: 30,  // 减少粒子数量提升性能
     particles: [],
+    enabled: true,
+    intervalId: null,
+    boundHandlers: {},  // 保存绑定的事件处理函数引用
 
     /**
      * 初始化所有视觉效果
      */
     init: function() {
+        const effectsMode = StorageManager.getEffectsMode();
+        this.enabled = effectsMode === 'cool';
+
+        if (!this.enabled) {
+            return;
+        }
+
         this.createParticlesContainer();
         this.createCursorGlow();
         this.initParticles();
         this.initCardEffects();
-        this.initScrollEffects();
     },
 
     /**
@@ -40,39 +50,45 @@ const VisualEffects = {
         this.cursorGlow.className = 'cursor-glow';
         document.body.appendChild(this.cursorGlow);
 
-        // 鼠标移动追踪
-        document.addEventListener('mousemove', (e) => {
-            requestAnimationFrame(() => {
-                this.cursorGlow.style.left = e.clientX + 'px';
-                this.cursorGlow.style.top = e.clientY + 'px';
-            });
-        });
+        // 保存事件处理函数引用，以便后续移除
+        this.boundHandlers.cursorMove = this.throttle((e) => {
+            if (!this.cursorGlow) return;
+            this.cursorGlow.style.left = e.clientX + 'px';
+            this.cursorGlow.style.top = e.clientY + 'px';
+        }, 16);  // ~60fps
 
-        // 鼠标离开/进入页面
-        document.addEventListener('mouseleave', () => {
-            this.cursorGlow.style.opacity = '0';
-        });
+        this.boundHandlers.cursorLeave = () => {
+            if (this.cursorGlow) this.cursorGlow.style.opacity = '0';
+        };
 
-        document.addEventListener('mouseenter', () => {
-            this.cursorGlow.style.opacity = '1';
-        });
+        this.boundHandlers.cursorEnter = () => {
+            if (this.cursorGlow) this.cursorGlow.style.opacity = '1';
+        };
+
+        document.addEventListener('mousemove', this.boundHandlers.cursorMove);
+        document.addEventListener('mouseleave', this.boundHandlers.cursorLeave);
+        document.addEventListener('mouseenter', this.boundHandlers.cursorEnter);
     },
 
     /**
      * 初始化粒子系统
      */
     initParticles: function() {
+        // 清除旧粒子
+        this.particles.forEach(p => p.remove());
+        this.particles = [];
+
         // 创建初始粒子
         for (let i = 0; i < this.particleCount; i++) {
             this.createParticle(true);
         }
 
-        // 持续生成新粒子
-        setInterval(() => {
+        // 持续生成新粒子（延长间隔提升性能）
+        this.intervalId = setInterval(() => {
             if (this.particles.length < this.particleCount) {
                 this.createParticle(false);
             }
-        }, 500);
+        }, 800);  // 从500ms延长到800ms
     },
 
     /**
@@ -83,34 +99,28 @@ const VisualEffects = {
         const particle = document.createElement('div');
         particle.className = 'particle';
 
-        // 随机大小
-        const size = Math.random() * 4 + 2;
+        // 随机大小（稍微增大提升视觉效果）
+        const size = Math.random() * 3 + 2;
         particle.style.width = size + 'px';
         particle.style.height = size + 'px';
 
         // 随机水平位置
         particle.style.left = Math.random() * 100 + '%';
 
-        // 随机动画时长
-        const duration = Math.random() * 15 + 10;
+        // 随机动画时长（延长动画时间减少CPU消耗）
+        const duration = Math.random() * 12 + 15;
         particle.style.animationDuration = duration + 's';
 
         // 随机延迟
         const delay = Math.random() * 5;
         particle.style.animationDelay = delay + 's';
 
-        // 随机透明度
-        particle.style.opacity = Math.random() * 0.5 + 0.3;
-
-        // 随机颜色变化 - 青色系
+        // 简化颜色（减少计算）
         const colors = [
-            'rgba(255, 255, 255, 0.6)',
-            'rgba(34, 211, 238, 0.6)',
-            'rgba(20, 184, 166, 0.6)',
-            'rgba(103, 232, 249, 0.6)'
+            'rgba(103, 232, 249, 0.5)',
+            'rgba(20, 184, 166, 0.5)'
         ];
         particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.boxShadow = `0 0 ${size * 2}px ${particle.style.background}`;
 
         // 如果是随机位置，则从任意位置开始
         if (randomPosition) {
@@ -136,20 +146,23 @@ const VisualEffects = {
      * 初始化卡片效果（3D倾斜 + 鼠标追踪光效）
      */
     initCardEffects: function() {
-        // 使用事件委托处理动态添加的卡片
-        document.addEventListener('mousemove', (e) => {
+        // 使用节流处理鼠标移动
+        this.boundHandlers.cardHover = this.throttle((e) => {
             const card = e.target.closest('.platform-card');
             if (card) {
                 this.handleCardHover(card, e);
             }
-        });
+        }, 16);  // ~60fps
 
-        document.addEventListener('mouseleave', (e) => {
+        this.boundHandlers.cardLeave = (e) => {
             const card = e.target.closest('.platform-card');
             if (card) {
                 this.resetCardTransform(card);
             }
-        }, true);
+        };
+
+        document.addEventListener('mousemove', this.boundHandlers.cardHover);
+        document.addEventListener('mouseleave', this.boundHandlers.cardLeave, true);
     },
 
     /**
@@ -164,16 +177,12 @@ const VisualEffects = {
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
 
-        // 计算3D倾斜角度
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
+        // 计算3D倾斜角度（简化计算）
+        const rotateX = Math.round((y - centerY) / 20);
+        const rotateY = Math.round((centerX - x) / 20);
 
         // 应用变换
         card.style.transform = `translateY(-8px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-
-        // 更新光效位置
-        card.style.setProperty('--mouse-x', x + 'px');
-        card.style.setProperty('--mouse-y', y + 'px');
     },
 
     /**
@@ -185,38 +194,19 @@ const VisualEffects = {
     },
 
     /**
-     * 初始化滚动效果
+     * 节流函数
+     * @param {Function} func 要执行的函数
+     * @param {number} limit 时间限制（毫秒）
      */
-    initScrollEffects: function() {
-        let ticking = false;
-
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                requestAnimationFrame(() => {
-                    this.handleScroll();
-                    ticking = false;
-                });
-                ticking = true;
+    throttle: function(func, limit) {
+        let inThrottle;
+        return function(...args) {
+            if (!inThrottle) {
+                func.apply(this, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
             }
-        });
-    },
-
-    /**
-     * 处理滚动事件
-     */
-    handleScroll: function() {
-        const scrollY = window.scrollY;
-        const cards = document.querySelectorAll('.platform-card');
-
-        cards.forEach((card, index) => {
-            const rect = card.getBoundingClientRect();
-            const windowHeight = window.innerHeight;
-
-            // 当卡片进入视口时添加动画
-            if (rect.top < windowHeight * 0.9) {
-                card.style.animationPlayState = 'running';
-            }
-        });
+        };
     },
 
     /**
@@ -258,12 +248,100 @@ const VisualEffects = {
      * 添加按钮涟漪效果
      */
     initButtonRipples: function() {
-        document.addEventListener('click', (e) => {
+        this.boundHandlers.rippleClick = (e) => {
             const button = e.target.closest('.btn');
             if (button) {
                 this.createRipple(button, e);
             }
+        };
+
+        document.addEventListener('click', this.boundHandlers.rippleClick);
+    },
+
+    /**
+     * 启用特效
+     */
+    enable: function() {
+        if (this.enabled) return;
+
+        this.enabled = true;
+        this.createParticlesContainer();
+        this.createCursorGlow();
+        this.initParticles();
+        this.initCardEffects();
+        this.initButtonRipples();
+
+        document.body.classList.remove('effects-disabled');
+    },
+
+    /**
+     * 禁用特效
+     */
+    disable: function() {
+        if (!this.enabled) return;
+
+        this.enabled = false;
+
+        // 清除粒子定时器
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+
+        // 移除事件监听器（防止累积）
+        if (this.boundHandlers.cursorMove) {
+            document.removeEventListener('mousemove', this.boundHandlers.cursorMove);
+        }
+        if (this.boundHandlers.cursorLeave) {
+            document.removeEventListener('mouseleave', this.boundHandlers.cursorLeave);
+        }
+        if (this.boundHandlers.cursorEnter) {
+            document.removeEventListener('mouseenter', this.boundHandlers.cursorEnter);
+        }
+        if (this.boundHandlers.cardHover) {
+            document.removeEventListener('mousemove', this.boundHandlers.cardHover);
+        }
+        if (this.boundHandlers.cardLeave) {
+            document.removeEventListener('mouseleave', this.boundHandlers.cardLeave, true);
+        }
+        if (this.boundHandlers.rippleClick) {
+            document.removeEventListener('click', this.boundHandlers.rippleClick);
+        }
+
+        // 清空处理函数引用
+        this.boundHandlers = {};
+
+        // 移除粒子容器和光效
+        if (this.particlesContainer) {
+            this.particlesContainer.remove();
+            this.particlesContainer = null;
+        }
+        if (this.cursorGlow) {
+            this.cursorGlow.remove();
+            this.cursorGlow = null;
+        }
+
+        // 清除粒子数组
+        this.particles = [];
+
+        // 移除卡片特效
+        document.querySelectorAll('.platform-card').forEach(card => {
+            card.style.transform = '';
         });
+
+        document.body.classList.add('effects-disabled');
+    },
+
+    /**
+     * 切换特效模式
+     * @param {string} mode 'cool' 或 'simple'
+     */
+    setMode: function(mode) {
+        if (mode === 'simple') {
+            this.disable();
+        } else {
+            this.enable();
+        }
     }
 };
 
@@ -279,8 +357,13 @@ rippleStyle.textContent = `
 `;
 document.head.appendChild(rippleStyle);
 
-// 页面加载完成后初始化
+// 页面加载完成后初始化（根据存储的特效模式）
 document.addEventListener('DOMContentLoaded', () => {
-    VisualEffects.init();
-    VisualEffects.initButtonRipples();
+    const effectsMode = StorageManager.getEffectsMode();
+    if (effectsMode === 'cool') {
+        VisualEffects.init();
+        VisualEffects.initButtonRipples();
+    } else {
+        document.body.classList.add('effects-disabled');
+    }
 });

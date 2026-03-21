@@ -932,6 +932,61 @@ body::after {
     animation: cardFadeOut 0.4s ease forwards;
 }
 
+/* ==================== 省电模式样式 ==================== */
+body.effects-disabled {
+    /* 移除动态渐变背景，改用静态柔和背景 */
+}
+
+body.effects-disabled::before {
+    background: linear-gradient(135deg, #1a365d 0%, #2d3748 50%, #1a202c 100%);
+    animation: none !important;
+}
+
+body.effects-disabled::after {
+    display: none !important;
+}
+
+/* 隐藏粒子容器 */
+body.effects-disabled #particles-container {
+    display: none !important;
+}
+
+/* 隐藏鼠标光效 */
+body.effects-disabled .cursor-glow {
+    display: none !important;
+}
+
+/* 省电模式下卡片简化样式 */
+body.effects-disabled .platform-card {
+    transform: none !important;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-md);
+}
+
+body.effects-disabled .platform-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--shadow-lg);
+}
+
+/* 省电模式下标题动画也关闭 */
+body.effects-disabled .header-title {
+    animation: none !important;
+}
+
+/* 省电模式下按钮涟漪效果也关闭 */
+body.effects-disabled .ripple {
+    display: none !important;
+}
+
+/* 省电模式图标样式 */
+.btn-icon:has(.effects-icon) {
+    position: relative;
+}
+
+.btn-icon:has(.effects-icon[textContent="💡"]) {
+    background: rgba(16, 185, 129, 0.2);
+}
+
 @keyframes cardFadeOut {
     from {
         opacity: 1;
