@@ -21,6 +21,7 @@
                 <button class="search-clear" id="searchClear" aria-label="清空搜索">×</button>
             </div>
             <button class="btn btn-secondary" id="addPlatformBtn" aria-label="添加新平台">+ 添加平台</button>
+            <button class="btn btn-secondary" id="selectModeBtn" aria-label="进入选择模式">☑️ 批量选择</button>
             <div class="dropdown">
                 <button class="btn btn-icon" id="moreBtn" aria-label="更多操作" aria-haspopup="true" aria-expanded="false">
                     <span aria-hidden="true">⋮</span>
@@ -79,6 +80,18 @@
 
     <!-- Toast 容器 -->
     <div class="toast-container" id="toastContainer" role="alert" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- 批量操作工具栏 -->
+    <div class="batch-toolbar" id="batchToolbar" role="toolbar" aria-label="批量操作">
+        <div class="batch-toolbar-left">
+            <span class="batch-selected-count">已选中 <strong id="selectedCount">0</strong> 个平台</span>
+        </div>
+        <div class="batch-toolbar-right">
+            <button class="btn btn-secondary" id="selectAllBtn" title="全选当前结果">全选</button>
+            <button class="btn btn-primary" id="batchOpenBtn" title="批量打开选中的平台">批量打开</button>
+            <button class="btn btn-secondary" id="cancelSelectBtn" title="退出选择模式">取消选择</button>
+        </div>
+    </div>
 
     <!-- 编辑弹窗 -->
     <div class="modal" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle" aria-describedby="editModalDesc">

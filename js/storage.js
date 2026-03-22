@@ -283,5 +283,46 @@ const StorageManager = {
         });
 
         return this.savePlatforms(orderedPlatforms);
+    },
+
+    /**
+     * 获取批量选择的平台ID列表
+     * @returns {Array} 选中的平台ID数组
+     */
+    getSelectedIds: function() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEYS.SELECTED_IDS);
+            return saved ? JSON.parse(saved) : [];
+        } catch (error) {
+            console.error('读取选中状态失败:', error);
+            return [];
+        }
+    },
+
+    /**
+     * 保存批量选择的平台ID列表
+     * @param {Array} ids 选中的平台ID数组
+     */
+    saveSelectedIds: function(ids) {
+        try {
+            localStorage.setItem(STORAGE_KEYS.SELECTED_IDS, JSON.stringify(ids));
+            return true;
+        } catch (error) {
+            console.error('保存选中状态失败:', error);
+            return false;
+        }
+    },
+
+    /**
+     * 清除所有批量选择
+     */
+    clearSelectedIds: function() {
+        try {
+            localStorage.removeItem(STORAGE_KEYS.SELECTED_IDS);
+            return true;
+        } catch (error) {
+            console.error('清除选中状态失败:', error);
+            return false;
+        }
     }
 };

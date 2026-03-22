@@ -215,13 +215,23 @@ const CATEGORIES = [
     { id: '其他', name: '其他' }
 ];
 
+// 分组配置
+const GROUPS = [
+    { id: 'all', name: '全部', icon: '📋' },
+    { id: '大模型', name: '大模型', icon: '🤖' },
+    { id: 'AI平台', name: 'AI平台', icon: '💬' },
+    { id: '图像生成', name: '图像生成', icon: '🎨' },
+    { id: '其他', name: '其他', icon: '📦' }
+];
+
 // localStorage键名常量
 const STORAGE_KEYS = {
     PLATFORMS_CONFIG: 'ai_platforms_config',
     THEME: 'ai_platforms_theme',
     CONFIG_VERSION: 'ai_platforms_config_version',
     VIEW_MODE: 'ai_platforms_view_mode',
-    EFFECTS_MODE: 'ai_platforms_effects_mode'
+    EFFECTS_MODE: 'ai_platforms_effects_mode',
+    SELECTED_IDS: 'ai_platforms_selected_ids'
 };
 
 // 配置版本号 - 修改平台列表时递增此版本号

@@ -10,8 +10,27 @@ const AppState = {
     currentEditPlatform: null,
     searchKeyword: '',
     currentCategory: 'all',
-    viewMode: 'grid'
+    viewMode: 'grid',
+    selectedIds: new Set(),
+    isSelectMode: false,
+    isDirty: false
 };
+
+/**
+ * 工具函数：防抖
+ * @param {Function} func 要执行的函数
+ * @param {number} wait 等待时间（毫秒）
+ * @returns {Function} 防抖后的函数
+ */
+function debounce(func, wait = 300) {
+    let timeout = null;
+    return function(...args) {
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(this, args);
+        }, wait);
+    };
+}
 
 /**
  * Toast 提示管理器
@@ -143,6 +162,9 @@ function initApp() {
     // 加载平台配置
     AppState.platforms = StorageManager.getPlatforms();
 
+    // 初始化选中状态
+    AppState.selectedIds = new Set(StorageManager.getSelectedIds());
+
     // 初始化主题
     initTheme();
 
@@ -163,6 +185,9 @@ function initApp() {
 
     // 绑定键盘快捷键
     bindKeyboardShortcuts();
+
+    // 更新批量工具栏状态
+    updateBatchToolbar();
 }
 
 /**
@@ -186,14 +211,15 @@ function initEffectsMode() {
 
 /**
  * 渲染分类标签
- * 从CATEGORIES配置动态生成分类标签
+ * 从GROUPS配置动态生成分类标签（排除all和starred）
  */
 function renderCategoryTabs() {
     const container = document.getElementById('categoryTabsContainer');
     if (!container) return;
 
-    container.innerHTML = CATEGORIES.map(cat =>
-        `<button class="filter-tab" data-category="${cat.id}">${cat.name}</button>`
+    const groupsToRender = GROUPS.filter(g => g.id !== 'all');
+    container.innerHTML = groupsToRender.map(group =>
+        `<button class="filter-tab" data-category="${group.id}" data-group-icon="${group.icon}">${group.icon} ${group.name}</button>`
     ).join('');
 
     renderCategorySelects();
@@ -207,8 +233,9 @@ function renderCategorySelects() {
     const editSelect = document.getElementById('editCategory');
     const addSelect = document.getElementById('addCategory');
 
-    const optionsHtml = CATEGORIES.map(cat =>
-        `<option value="${cat.id}">${cat.name}</option>`
+    const validGroups = GROUPS.filter(g => g.id !== 'all' && g.id !== 'starred');
+    const optionsHtml = validGroups.map(group =>
+        `<option value="${group.id}">${group.icon} ${group.name}</option>`
     ).join('');
 
     if (editSelect) editSelect.innerHTML = optionsHtml;
@@ -330,9 +357,18 @@ function createPlatformCard(platform) {
     const showUrl = displayUrl.length > 50 ? displayUrl.substring(0, 50) + '...' : displayUrl;
     const starredClass = platform.starred ? 'starred' : '';
     const starredIcon = platform.starred ? '⭐' : '☆';
+    const isSelected = AppState.selectedIds.has(platform.id);
+    const selectedClass = isSelected ? 'selected' : '';
+    const selectModeClass = AppState.isSelectMode ? 'select-mode' : '';
+    const checkboxChecked = isSelected ? 'checked' : '';
 
     return `
-        <div class="platform-card ${starredClass}" data-id="${platform.id}" draggable="true">
+        <div class="platform-card ${starredClass} ${selectedClass} ${selectModeClass}" data-id="${platform.id}" draggable="true">
+            <div class="card-checkbox ${checkboxChecked}" data-action="select" data-id="${platform.id}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
             <div class="drag-handle" title="拖拽排序" aria-label="拖拽排序">⋮⋮</div>
             <div class="platform-card-header">
                 <div class="platform-icon">${platform.icon || '📦'}</div>
@@ -411,6 +447,12 @@ function bindEvents() {
 
     // 导入确认弹窗事件
     setupImportConfirmModalEvents();
+
+    // 批量选择模式事件
+    document.getElementById('selectModeBtn').addEventListener('click', enterSelectMode);
+    document.getElementById('selectAllBtn').addEventListener('click', selectAll);
+    document.getElementById('batchOpenBtn').addEventListener('click', batchOpenSelected);
+    document.getElementById('cancelSelectBtn').addEventListener('click', exitSelectMode);
 
     // 初始化拖拽排序
     initDragAndDrop();
@@ -540,6 +582,14 @@ function initDragAndDrop() {
  */
 function handleCardClick(event) {
     const button = event.target.closest('button');
+    const checkbox = event.target.closest('.card-checkbox');
+
+    if (checkbox) {
+        const platformId = checkbox.dataset.id;
+        togglePlatformSelect(platformId);
+        return;
+    }
+
     if (!button) return;
 
     const action = button.dataset.action;
@@ -562,6 +612,134 @@ function handleCardClick(event) {
 }
 
 /**
+ * 切换平台选中状态
+ * @param {string} platformId 平台ID
+ */
+function togglePlatformSelect(platformId) {
+    if (AppState.selectedIds.has(platformId)) {
+        AppState.selectedIds.delete(platformId);
+    } else {
+        AppState.selectedIds.add(platformId);
+    }
+
+    AppState.isDirty = true;
+    updateSelectUI();
+    updateBatchToolbar();
+    scheduleSaveSelectedIds();
+}
+
+/**
+ * 延迟保存选中状态（避免频繁写入）
+ */
+let saveTimeout = null;
+function scheduleSaveSelectedIds() {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        if (AppState.isDirty) {
+            StorageManager.saveSelectedIds(Array.from(AppState.selectedIds));
+            AppState.isDirty = false;
+        }
+    }, 500);
+}
+
+/**
+ * 更新选择UI状态
+ */
+function updateSelectUI() {
+    const cards = document.querySelectorAll('.platform-card');
+    cards.forEach(card => {
+        const id = card.dataset.id;
+        const checkbox = card.querySelector('.card-checkbox');
+        if (AppState.selectedIds.has(id)) {
+            card.classList.add('selected');
+            checkbox.classList.add('checked');
+        } else {
+            card.classList.remove('selected');
+            checkbox.classList.remove('checked');
+        }
+    });
+}
+
+/**
+ * 更新批量工具栏状态
+ */
+function updateBatchToolbar() {
+    const toolbar = document.getElementById('batchToolbar');
+    const count = AppState.selectedIds.size;
+
+    if (count > 0) {
+        toolbar.classList.add('active');
+        document.getElementById('selectedCount').textContent = count;
+    } else {
+        toolbar.classList.remove('active');
+    }
+}
+
+/**
+ * 进入选择模式
+ */
+function enterSelectMode() {
+    AppState.isSelectMode = true;
+    document.body.classList.add('select-mode-active');
+    renderPlatforms();
+    ToastManager.show('已进入选择模式，点击卡片即可选中', 'info', 2000);
+}
+
+/**
+ * 退出选择模式时确保保存
+ */
+function exitSelectMode() {
+    AppState.isSelectMode = false;
+    AppState.selectedIds.clear();
+
+    if (saveTimeout) clearTimeout(saveTimeout);
+    if (AppState.isDirty) {
+        StorageManager.clearSelectedIds();
+        AppState.isDirty = false;
+    }
+
+    document.body.classList.remove('select-mode-active');
+    renderPlatforms();
+    updateBatchToolbar();
+    ToastManager.show('已退出选择模式', 'info', 1500);
+}
+
+/**
+ * 全选当前筛选结果
+ */
+function selectAll() {
+    const visibleCards = document.querySelectorAll('.platform-card');
+    visibleCards.forEach(card => {
+        AppState.selectedIds.add(card.dataset.id);
+    });
+    StorageManager.saveSelectedIds(Array.from(AppState.selectedIds));
+    updateSelectUI();
+    updateBatchToolbar();
+    ToastManager.show(`已选中 ${AppState.selectedIds.size} 个平台`, 'success');
+}
+
+/**
+ * 批量打开选中的平台
+ */
+function batchOpenSelected() {
+    const selectedPlatforms = AppState.platforms.filter(p => AppState.selectedIds.has(p.id));
+
+    if (selectedPlatforms.length === 0) {
+        ToastManager.show('请先选择要打开的平台', 'warning');
+        return;
+    }
+
+    selectedPlatforms.forEach(platform => {
+        const url = platform.customUrl || platform.url;
+        if (url) {
+            window.open(url, '_blank');
+        }
+    });
+
+    ToastManager.show(`正在打开 ${selectedPlatforms.length} 个平台...`, 'success');
+}
+
+/**
  * 切换收藏状态
  * @param {string} platformId 平台ID
  */
@@ -577,17 +755,16 @@ function toggleStar(platformId) {
 }
 
 /**
- * 处理搜索
+ * 处理搜索（带防抖）
  * @param {Event} event 输入事件
  */
-function handleSearch(event) {
+const handleSearch = debounce(function(event) {
     AppState.searchKeyword = event.target.value.trim();
     renderPlatforms();
 
-    // 显示/隐藏清空按钮
     const clearBtn = document.getElementById('searchClear');
     clearBtn.style.opacity = AppState.searchKeyword ? '1' : '0';
-}
+}, 150);
 
 /**
  * 清空搜索

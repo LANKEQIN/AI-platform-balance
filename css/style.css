@@ -205,21 +205,25 @@ body::after {
     pointer-events: none;
     z-index: -1;
     overflow: hidden;
+    contain: layout paint;
 }
 
 .particle {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.6);
+    width: 4px;
+    height: 4px;
+    background: rgba(103, 232, 249, 0.5);
     border-radius: 50%;
     animation: floatParticle linear infinite;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 6px rgba(103, 232, 249, 0.3);
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 @keyframes floatParticle {
     0% {
-        transform: translateY(100vh) rotate(0deg);
+        transform: translate3d(0, 100vh, 0) rotate(0deg);
         opacity: 0;
     }
     10% {
@@ -229,7 +233,7 @@ body::after {
         opacity: 1;
     }
     100% {
-        transform: translateY(-100vh) rotate(720deg);
+        transform: translate3d(0, -100vh, 0) rotate(720deg);
         opacity: 0;
     }
 }
@@ -462,12 +466,17 @@ body::after {
     border: 1px solid var(--glass-border);
     position: relative;
     overflow: hidden;
-    transition: all var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow var(--duration-normal) ease,
+                border-color var(--duration-normal) ease;
     animation: cardFloatIn var(--duration-slow) ease backwards;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .platform-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-4px) translateZ(0);
     box-shadow: var(--shadow-glow), var(--shadow-lg);
     border-color: var(--glass-border-strong);
 }
@@ -480,25 +489,25 @@ body::after {
 @keyframes cardFloatIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(20px) translateZ(0);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) translateZ(0);
     }
 }
 
-/* 卡片入场动画延迟 - 使用更简单的 stagger 方式 */
-.platform-card:nth-child(1) { animation-delay: 0.05s; }
-.platform-card:nth-child(2) { animation-delay: 0.1s; }
-.platform-card:nth-child(3) { animation-delay: 0.15s; }
-.platform-card:nth-child(4) { animation-delay: 0.2s; }
-.platform-card:nth-child(5) { animation-delay: 0.25s; }
-.platform-card:nth-child(6) { animation-delay: 0.3s; }
-.platform-card:nth-child(7) { animation-delay: 0.35s; }
-.platform-card:nth-child(8) { animation-delay: 0.4s; }
-.platform-card:nth-child(9) { animation-delay: 0.45s; }
-.platform-card:nth-child(10) { animation-delay: 0.5s; }
+/* 卡片入场动画延迟 - 简化为 8 个 */
+.platform-card:nth-child(1),
+.platform-card:nth-child(2),
+.platform-card:nth-child(3),
+.platform-card:nth-child(4),
+.platform-card:nth-child(5),
+.platform-card:nth-child(6),
+.platform-card:nth-child(7),
+.platform-card:nth-child(8) {
+    animation-delay: calc(var(--animation-index, 0) * 0.05s);
+}
 
 /* 卡片顶部光泽 */
 .platform-card::before {
@@ -941,6 +950,138 @@ body::after {
     .platform-card-footer {
         flex-direction: column;
     }
+
+    .batch-toolbar {
+        height: auto;
+        flex-direction: column;
+        padding: var(--spacing-md);
+        gap: var(--spacing-sm);
+    }
+
+    .batch-toolbar-left,
+    .batch-toolbar-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .batch-toolbar-right {
+        flex-wrap: wrap;
+    }
+
+    .batch-toolbar-right .btn {
+        flex: 1;
+        min-width: 100px;
+    }
+}
+
+/* ==================== 批量操作工具栏 ==================== */
+.batch-toolbar {
+    position: fixed;
+    bottom: -80px;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--spacing-lg);
+    z-index: var(--z-sticky);
+    transition: bottom var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.batch-toolbar.active {
+    bottom: 0;
+}
+
+.batch-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.batch-selected-count {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.batch-selected-count strong {
+    color: var(--primary-light);
+    font-size: 1.125rem;
+}
+
+.batch-toolbar-right {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* ==================== 选择模式样式 ==================== */
+body.select-mode-active .platform-card {
+    cursor: pointer;
+}
+
+body.select-mode-active .card-checkbox {
+    opacity: 1;
+    visibility: visible;
+}
+
+body.select-mode-active .drag-handle {
+    display: none;
+}
+
+body.select-mode-active .btn-go,
+body.select-mode-active .btn-edit {
+    display: none;
+}
+
+body.select-mode-active .platform-card:hover {
+    transform: none;
+}
+
+/* 卡片复选框 */
+.card-checkbox {
+    position: absolute;
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--duration-fast) ease;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.card-checkbox svg {
+    width: 14px;
+    height: 14px;
+    color: white;
+    opacity: 0;
+    transition: opacity var(--duration-fast) ease;
+}
+
+.card-checkbox.checked {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.card-checkbox.checked svg {
+    opacity: 1;
+}
+
+.platform-card.selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
 }
 
 /* ==================== 下拉菜单 - 玻璃效果 ==================== */
