@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI平台余额快捷入口 - 一键直达各大AI平台余额页面">
+    <title>AI平台余额快捷入口</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- 古风字体 - 霞鹜文楷（落霞孤鹜） -->
+    <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+    <style>
+        /* ==================== CSS变量定义 - 古风青色系 ==================== */
+        :root {
+            /* 主色调 - 古风青色系 */
+            --primary-cyan: #2dd4bf;
+            --primary-cyan-light: #5eead4;
+            --primary-cyan-dark: #0d9488;
+            --primary-teal: #14b8a6;
+            --primary-teal-dark: #0f766e;
+            
+            /* 辅助色 - 水墨意境 */
+            --ink-black: #1a1a2e;
+            --ink-gray: #4a5568;
+            --ink-light: #94a3b8;
+            --paper-white: #faf9f6;
+            --paper-cream: #f5f0e8;
+            
+            /* 渐变色彩 */
+            --gradient-start: #0f766e;
+            --gradient-mid: #115e59;
+            --gradient-end: #134e4a;
+            
+            /* 玻璃效果 - 古风半透明 */
+            --glass-bg: rgba(20, 184, 166, 0.08);
+            --glass-bg-hover: rgba(20, 184, 166, 0.15);
+            --glass-border: rgba(45, 212, 191, 0.2);
+            --glass-border-strong: rgba(45, 212, 191, 0.4);
+            
+            /* 文字颜色 */
+            --text-primary: #f0fdfa;
+            --text-secondary: rgba(240, 253, 250, 0.85);
+            --text-muted: rgba(240, 253, 250, 0.6);
+            --text-ink: #1a1a2e;
+            
+            /* 阴影与光效 */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 40px rgba(45, 212, 191, 0.3);
+            --shadow-glow-strong: 0 0 60px rgba(45, 212, 191, 0.5);
+            
+            /* 圆角 */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            
+            /* 动画时间 */
+            --duration-fast: 200ms;
+            --duration-normal: 400ms;
+            --duration-slow: 800ms;
+            
+            /* 字体 - 统一使用霞鹜文楷（落霞孤鹜） */
+            --font-serif: 'LXGW WenKai', 'LXGWWenKai-Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --font-calligraphy: 'LXGW WenKai', 'LXGWWenKai-Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        /* ==================== 基础样式重置 ==================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.8;
+        }
+
+        /* ==================== 背景装饰 - 水墨粒子效果 ==================== */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ink-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.15) 0%, transparent 70%);
+            animation: float-ink 20s infinite ease-in-out;
+        }
+
+        .ink-particle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .ink-particle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: 15%;
+            animation-delay: -5s;
+        }
+
+        .ink-particle:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -10s;
+        }
+
+        .ink-particle:nth-child(4) {
+            width: 180px;
+            height: 180px;
+            top: 30%;
+            right: 25%;
+            animation-delay: -15s;
+        }
+
+        @keyframes float-ink {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(30px, -30px) scale(1.1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-20px, 20px) scale(0.9);
+                opacity: 0.4;
+            }
+            75% {
+                transform: translate(20px, 10px) scale(1.05);
+                opacity: 0.35;
+            }
+        }
+
+        /* 飘落花瓣效果 */
+        .petal {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.6), rgba(94, 234, 212, 0.3));
+            border-radius: 50% 0 50% 50%;
+            animation: fall-petal 15s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes fall-petal {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* ==================== 主容器 ==================== */
+        .landing-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* ==================== 诗词与名言展示区 ==================== */
+        .quotes-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 60px;
+            animation: fade-in-up 1s ease-out;
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quote-card {
+            position: relative;
+            padding: 32px 40px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(10px);
+            transition: all var(--duration-normal) ease;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quote-card:hover {
+            background: var(--glass-bg-hover);
+            border-color: var(--glass-border-strong);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-4px);
+        }
+
+        /* 卡片标签 */
+        .quote-label {
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            padding: 4px 16px;
+            background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-teal) 100%);
+            color: var(--text-ink);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.1em;
+        }
+
+        /* 装饰性引号 */
+        .quote-card::before,
+        .quote-card::after {
+            content: '"';
+            position: absolute;
+            font-family: var(--font-calligraphy);
+            font-size: 60px;
+            color: var(--primary-cyan);
+            opacity: 0.2;
+            line-height: 1;
+        }
+
+        .quote-card::before {
+            top: 16px;
+            left: 16px;
+        }
+
+        .quote-card::after {
+            bottom: -10px;
+            right: 16px;
+            transform: rotate(180deg);
+        }
+
+        .quote-line {
+            font-family: var(--font-calligraphy);
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: var(--text-primary);
+            margin: 8px 0;
+            letter-spacing: 0.1em;
+            line-height: 1.8;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all var(--duration-normal) ease;
+        }
+
+        .quote-author {
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 16px;
+            font-style: italic;
+            letter-spacing: 0.05em;
+        }
+
+        .quote-refresh {
+            position: absolute;
+            bottom: -16px;
+            right: 24px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--primary-cyan);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--duration-fast) ease;
+            font-size: 16px;
+        }
+
+        .quote-refresh:hover {
+            background: var(--primary-cyan);
+            color: var(--text-ink);
+            box-shadow: var(--shadow-glow);
+            transform: rotate(180deg);
+        }
+
+        /* ==================== 主标题区 ==================== */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fade-in-up 1s ease-out 0.2s both;
+        }
+
+        .hero-title {
+            font-family: var(--font-calligraphy);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-cyan-light) 50%, var(--primary-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.15em;
+            text-shadow: none;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ==================== 功能特性卡片 ==================== */
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            width: 100%;
+            margin-bottom: 60px;
+            animation: fade-in-up 1s ease-out 0.4s both;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 32px 24px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all var(--duration-normal) ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+            transform: scaleX(0);
+            transition: transform var(--duration-normal) ease;
+        }
+
+        .feature-card:hover {
+            background: var(--glass-bg-hover);
+            border-color: var(--glass-border-strong);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-teal) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-title {
+            font-family: var(--font-calligraphy);
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ==================== CTA按钮区 ==================== */
+        .cta-section {
+            text-align: center;
+            animation: fade-in-up 1s ease-out 0.6s both;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 48px;
+            font-family: var(--font-calligraphy);
+            font-size: 1.25rem;
+            color: var(--text-ink);
+            background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-cyan-light) 100%);
+            border: none;
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all var(--duration-normal) ease;
+            box-shadow: var(--shadow-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-glow-strong);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .cta-arrow {
+            transition: transform var(--duration-fast) ease;
+        }
+
+        .cta-button:hover .cta-arrow {
+            transform: translateX(4px);
+        }
+
+        .cta-hint {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* ==================== 页脚 ==================== */
+        .landing-footer {
+            margin-top: 80px;
+            text-align: center;
+            padding: 24px;
+            border-top: 1px solid var(--glass-border);
+            animation: fade-in-up 1s ease-out 0.8s both;
+        }
+
+        .footer-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        /* ==================== 响应式适配 ==================== */
+        @media (max-width: 768px) {
+            .landing-container {
+                padding: 24px 16px;
+            }
+
+            .poetry-container {
+                padding: 32px 24px;
+            }
+
+            .poetry-container::before,
+            .poetry-container::after {
+                font-size: 50px;
+            }
+
+            .features-section {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .feature-card {
+                padding: 24px 20px;
+            }
+
+            .cta-button {
+                padding: 16px 36px;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* ==================== 诗词切换动画 ==================== */
+        .poetry-fade-out {
+            animation: poetry-fade-out 0.5s ease forwards;
+        }
+
+        .poetry-fade-in {
+            animation: poetry-fade-in 0.5s ease forwards;
+        }
+
+        @keyframes poetry-fade-out {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes poetry-fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration" id="bgDecoration">
+        <div class="ink-particle"></div>
+        <div class="ink-particle"></div>
+        <div class="ink-particle"></div>
+        <div class="ink-particle"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="landing-container">
+        <!-- 诗词与名言展示区 -->
+        <section class="quotes-section">
+            <!-- 古诗词卡片 -->
+            <div class="quote-card">
+                <span class="quote-label">古诗词</span>
+                <div id="poetryContent">
+                    <p class="quote-line" id="poetryLine1">云深不知处</p>
+                    <p class="quote-line" id="poetryLine2">只在此山中</p>
+                    <p class="quote-author" id="poetryAuthor">—— 唐 · 贾岛《寻隐者不遇》</p>
+                </div>
+                <button class="quote-refresh" id="poetryRefresh" title="切换诗词">⟲</button>
+            </div>
+            
+            <!-- 名人名言卡片 -->
+            <div class="quote-card">
+                <span class="quote-label">名人名言</span>
+                <div id="quoteContent">
+                    <p class="quote-line" id="quoteLine1">预测未来的最好方式就是创造它。</p>
+                    <p class="quote-line" id="quoteLine2"></p>
+                    <p class="quote-author" id="quoteAuthor">—— Alan Kay · 图灵奖得主</p>
+                </div>
+                <button class="quote-refresh" id="quoteRefresh" title="切换名言">⟲</button>
+            </div>
+        </section>
+
+        <!-- 主标题区 -->
+        <section class="hero-section">
+            <h1 class="hero-title">AI 平台余额快捷入口</h1>
+            <p class="hero-subtitle">
+                汇聚各大 AI 平台，一键直达余额页面<br>
+                让科技与传统美学在此相遇
+            </p>
+        </section>
+
+        <!-- 功能特性 -->
+        <section class="features-section">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">快捷访问</h3>
+                <p class="feature-desc">一键直达各大 AI 平台余额页面，省去繁琐导航，效率倍增</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3 class="feature-title">自定义配置</h3>
+                <p class="feature-desc">支持添加自定义平台链接，灵活管理你的 AI 服务入口</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">本地存储</h3>
+                <p class="feature-desc">配置数据保存在本地，隐私安全，随时导入导出</p>
+            </div>
+        </section>
+
+        <!-- CTA按钮 -->
+        <section class="cta-section">
+            <a href="index.html" class="cta-button">
+                <span>进入应用</span>
+                <span class="cta-arrow">→</span>
+            </a>
+            <p class="cta-hint">无需登录，打开即用</p>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="landing-footer">
+            <p class="footer-text">青出于蓝 · 而胜于蓝</p>
+        </footer>
+    </div>
+
+    <!-- 引入诗词数据文件 -->
+    <script src="js/poetry.js"></script>
+    <script>
+        // ==================== 古诗词切换功能 ====================
+        let poetryIndex = 0;
+        
+        function updatePoetry() {
+            const poetryContent = document.getElementById('poetryContent');
+            
+            // 随机获取古诗词
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * poetryDatabase.length);
+            } while (newIndex === poetryIndex && poetryDatabase.length > 1);
+            poetryIndex = newIndex;
+            
+            const poetry = poetryDatabase[poetryIndex];
+            
+            // 淡出动画
+            poetryContent.classList.add('poetry-fade-out');
+            
+            setTimeout(() => {
+                // 更新内容
+                document.getElementById('poetryLine1').textContent = poetry.line1;
+                document.getElementById('poetryLine2').textContent = poetry.line2;
+                document.getElementById('poetryAuthor').textContent = '—— ' + poetry.author;
+                
+                // 移除淡出类，添加淡入类
+                poetryContent.classList.remove('poetry-fade-out');
+                poetryContent.classList.add('poetry-fade-in');
+                
+                setTimeout(() => {
+                    poetryContent.classList.remove('poetry-fade-in');
+                }, 500);
+            }, 500);
+        }
+
+        // 绑定古诗词刷新按钮
+        document.getElementById('poetryRefresh').addEventListener('click', updatePoetry);
+
+        // 自动切换古诗词（每30秒）
+        setInterval(updatePoetry, 30000);
+
+        // ==================== 名人名言切换功能 ====================
+        let quoteIndex = 0;
+        
+        function updateQuote() {
+            const quoteContent = document.getElementById('quoteContent');
+            
+            // 随机获取名人名言
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * quotesDatabase.length);
+            } while (newIndex === quoteIndex && quotesDatabase.length > 1);
+            quoteIndex = newIndex;
+            
+            const quote = quotesDatabase[quoteIndex];
+            
+            // 淡出动画
+            quoteContent.classList.add('poetry-fade-out');
+            
+            setTimeout(() => {
+                // 更新内容
+                document.getElementById('quoteLine1').textContent = quote.line1;
+                document.getElementById('quoteLine2').textContent = quote.line2;
+                document.getElementById('quoteAuthor').textContent = '—— ' + quote.author;
+                
+                // 移除淡出类，添加淡入类
+                quoteContent.classList.remove('poetry-fade-out');
+                quoteContent.classList.add('poetry-fade-in');
+                
+                setTimeout(() => {
+                    quoteContent.classList.remove('poetry-fade-in');
+                }, 500);
+            }, 500);
+        }
+
+        // 绑定名人名言刷新按钮
+        document.getElementById('quoteRefresh').addEventListener('click', updateQuote);
+
+        // 自动切换名人名言（每35秒，与诗词错开）
+        setInterval(updateQuote, 35000);
+
+        // ==================== 飘落花瓣效果 ====================
+        function createPetal() {
+            const bgDecoration = document.getElementById('bgDecoration');
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            
+            // 随机位置和动画时长
+            const startLeft = Math.random() * 100;
+            const duration = 10 + Math.random() * 10;
+            const delay = Math.random() * 5;
+            
+            petal.style.left = startLeft + '%';
+            petal.style.animationDuration = duration + 's';
+            petal.style.animationDelay = delay + 's';
+            
+            // 随机大小
+            const size = 8 + Math.random() * 8;
+            petal.style.width = size + 'px';
+            petal.style.height = size + 'px';
+            
+            bgDecoration.appendChild(petal);
+            
+            // 动画结束后移除元素
+            setTimeout(() => {
+                petal.remove();
+            }, (duration + delay) * 1000);
+        }
+
+        // 初始创建一些花瓣
+        for (let i = 0; i < 15; i++) {
+            setTimeout(createPetal, i * 300);
+        }
+
+        // 持续创建花瓣
+        setInterval(createPetal, 2000);
+
+        // ==================== 页面加载动画 ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化随机古诗词
+            poetryIndex = Math.floor(Math.random() * poetryDatabase.length);
+            const poetry = poetryDatabase[poetryIndex];
+            document.getElementById('poetryLine1').textContent = poetry.line1;
+            document.getElementById('poetryLine2').textContent = poetry.line2;
+            document.getElementById('poetryAuthor').textContent = '—— ' + poetry.author;
+            
+            // 初始化随机名人名言
+            quoteIndex = Math.floor(Math.random() * quotesDatabase.length);
+            const quote = quotesDatabase[quoteIndex];
+            document.getElementById('quoteLine1').textContent = quote.line1;
+            document.getElementById('quoteLine2').textContent = quote.line2;
+            document.getElementById('quoteAuthor').textContent = '—— ' + quote.author;
+        });
+
+        // ==================== 鼠标跟随效果 ====================
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.feature-card');
+            const mouseX = e.clientX / window.innerWidth - 0.5;
+            const mouseY = e.clientY / window.innerHeight - 0.5;
+            
+            cards.forEach((card, index) => {
+                const intensity = (index + 1) * 2;
+                const rotateX = mouseY * intensity;
+                const rotateY = mouseX * intensity;
+                
+                if (card.matches(':hover')) {
+                    card.style.transform = `translateY(-8px) perspective(1000px) rotateX(${-rotateX}deg) rotateY(${rotateY}deg)`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -102,6 +102,54 @@ const DEFAULT_PLATFORMS = [
         enabled: true
     },
     {
+        id: 'siliconflow-global',
+        name: '硅基流动（国际）',
+        category: '大模型',
+        url: 'https://cloud.siliconflow.com/models',
+        icon: '💎',
+        enabled: true
+    },
+    {
+        id: 'openrouter',
+        name: 'OpenRouter',
+        category: '大模型',
+        url: 'https://openrouter.ai/',
+        icon: '🛤️',
+        enabled: true
+    },
+    {
+        id: 'aihubmix',
+        name: 'AIHubMix',
+        category: '大模型',
+        url: 'https://aihubmix.com/models',
+        icon: '🧩',
+        enabled: true
+    },
+    {
+        id: 'zhipu-open',
+        name: '智谱开放平台',
+        category: '大模型',
+        url: 'https://open.bigmodel.cn/pricing',
+        icon: '🧠',
+        enabled: true
+    },
+    {
+        id: 'zhipu-global',
+        name: '智谱国际',
+        category: '大模型',
+        url: 'https://z.ai/manage-apikey/apikey-list',
+        icon: '🌐',
+        enabled: true
+    },
+    {
+        id: 'aigcpanel',
+        name: 'AIGC Panel',
+        category: '其他',
+        url: 'https://aigcpanel.com/zh',
+        icon: '🎭',
+        enabled: true
+    },
+    {
         id: 'grok',
         name: 'Grok',
         category: 'AI平台',
@@ -132,6 +180,30 @@ const DEFAULT_PLATFORMS = [
         url: 'https://manus.im/app',
         icon: '✋',
         enabled: true
+    },
+    {
+        id: 'ai-bot',
+        name: 'AI工具集',
+        category: '其他',
+        url: 'https://ai-bot.cn',
+        icon: '🧰',
+        enabled: true
+    },
+    {
+        id: 'aibase-daily',
+        name: 'AI日报',
+        category: '其他',
+        url: 'https://news.aibase.com/zh/daily',
+        icon: '📰',
+        enabled: true
+    },
+    {
+        id: 'huggingface',
+        name: 'Hugging Face',
+        category: 'AI平台',
+        url: 'https://huggingface.co',
+        icon: '🤗',
+        enabled: true
     }
 ];
 
@@ -153,4 +225,4 @@ const STORAGE_KEYS = {
 };
 
 // 配置版本号 - 修改平台列表时递增此版本号
-const CONFIG_VERSION = 2;
+const CONFIG_VERSION = 3;
