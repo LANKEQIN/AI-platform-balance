@@ -28,21 +28,25 @@
 <td width="50%">
 
 ### 🎯 核心功能
-- **📊 平台卡片展示** - 直观展示所有 AI 平台
+- **📊 平台卡片展示** - 网格/列表双视图展示 AI 平台
 - **🔗 一键直达** - 点击即可跳转到余额页面
 - **✏️ 自定义链接** - 支持修改默认链接地址
-- **🔍 智能搜索** - 快速定位目标平台
-- **🌓 深色模式** - 护眼深色主题切换
+- **🔍 智能搜索** - 快速定位目标平台 (`Ctrl+K`)
+- **🌓 深色模式** - 护眼深色主题一键切换
+- **🏷️ 分类筛选** - 按分类快速过滤平台
+- **⭐ 收藏功能** - 收藏常用平台置顶显示
 
 </td>
 <td width="50%">
 
 ### 🚀 进阶特性
-- **📈 余额记录** - 手动记录余额变化历史
-- **📉 趋势图表** - 可视化余额消耗趋势
-- **🔔 低余额提醒** - 阈值提醒防止余额不足
-- **📤 数据导出** - JSON 格式备份与恢复
-- **⚡ 快捷键支持** - `Ctrl+K` 快速搜索
+- **➕ 添加/删除平台** - 自定义管理平台列表
+- **� 数据导入导出** - JSON 格式配置备份与恢复
+- **⚡ 特效模式** - 炫酷的粒子特效切换
+- **� PWA 支持** - 可添加到桌面离线使用
+- **� 本地持久化** - localStorage 自动保存配置
+- **♿ 无障碍支持** - 完善的 ARIA 标签和键盘导航
+- **🌐 国际化准备** - 纯中文界面
 
 </td>
 </tr>
@@ -81,7 +85,7 @@ python -m http.server 3000
 
 1. 点击右上角 **"+ 添加平台"** 按钮
 2. 填写平台名称和余额页面链接
-3. 选择分类（大模型/图像生成/其他）
+3. 选择分类（大模型/AI平台/其他）
 4. 点击保存即可
 
 ### 编辑平台链接
@@ -90,23 +94,24 @@ python -m http.server 3000
 2. 修改链接地址
 3. 点击保存，配置自动持久化到本地
 
-### 记录余额
+### 切换视图
 
-1. 进入编辑弹窗的 **"历史记录"** 标签页
-2. 输入当前余额数值
-3. 系统自动生成趋势图表
+1. 点击工具栏右侧的 **▦/☰** 按钮
+2. 可以在网格视图和列表视图之间切换
+3. 视图模式会自动保存
+
+### 收藏平台
+
+1. 点击平台卡片上的 **星标图标** 或在编辑弹窗中勾选"收藏此平台"
+2. 收藏的平台会显示在列表最前面
+3. 可通过工具栏的 **"已收藏"** 筛选按钮快速查看
 
 ### 数据备份
 
-```javascript
-// 导出配置
-const config = localStorage.getItem('ai_platforms_config');
-const blob = new Blob([config], { type: 'application/json' });
-// 下载文件...
-
-// 导入配置
-localStorage.setItem('ai_platforms_config', importedConfig);
-```
+点击右上角 **⋮** 菜单：
+- **导出配置** - 下载 JSON 格式的完整配置
+- **导入配置** - 从 JSON 文件恢复配置
+- **重置配置** - 恢复默认平台列表
 
 ---
 
@@ -123,8 +128,8 @@ localStorage.setItem('ai_platforms_config', importedConfig);
 ├─────────────────────────────────────────────────────────┤
 │                      业务逻辑层                          │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────┐   │
-│  │  平台管理    │ │  数据持久化  │ │  图表渲染       │   │
-│  │  Platform   │ │  Storage    │ │  Chart Render   │   │
+│  │  平台管理    │ │  数据持久化  │ │  特效引擎       │   │
+│  │  Platform   │ │  Storage    │ │  Effects       │   │
 │  │  Manager    │ │  Manager    │ │                 │   │
 │  └─────────────┘ └─────────────┘ └─────────────────┘   │
 ├─────────────────────────────────────────────────────────┤
@@ -133,7 +138,8 @@ localStorage.setItem('ai_platforms_config', importedConfig);
 │  │              Browser LocalStorage                │   │
 │  │  • ai_platforms_config  - 平台配置              │   │
 │  │  • ai_platforms_theme   - 主题设置              │   │
-│  │  • balance_records      - 余额历史              │   │
+│  │  • ai_platforms_view    - 视图模式              │   │
+│  │  • ai_effects_enabled   - 特效开关              │   │
 │  └─────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -142,56 +148,67 @@ localStorage.setItem('ai_platforms_config', importedConfig);
 
 | 层级 | 技术 | 说明 |
 |------|------|------|
-| 结构 | HTML5 | 语义化标签，SEO友好 |
+| 结构 | HTML5 | 语义化标签，ARIA无障碍支持 |
 | 样式 | CSS3 | CSS变量主题，Grid/Flex布局 |
-| 逻辑 | ES6+ | 模块化开发，Async/Await |
+| 逻辑 | ES6+ | 模块化开发，中文注释 |
 | 存储 | localStorage | 本地持久化，零后端依赖 |
-| 图表 | Chart.js | 轻量级图表库（可选） |
+| PWA | Service Worker | 离线支持，桌面快捷方式 |
 
 ---
 
 ## 📁 项目结构
 
 ```
-ai-platform-balance/
+API Balance/
 ├── 📄 index.html              # 主入口文件
-├── 📁 css/
-│   └── 🎨 style.css           # 全局样式 + 主题变量
+├── 📄 landing.html            # PWA落地页
+├── 📄 service-worker.js       # Service Worker（PWA支持）
+├── � manifest.json           # PWA清单文件
+├── 📄 css/
+│   └── 🎨 style.css          # 全局样式 + 主题变量
 ├── 📁 js/
-│   ├── ⚙️ config.js           # 平台预设配置
-│   ├── 💾 storage.js          # localStorage 封装
-│   └── 🚀 app.js              # 核心业务逻辑
-├── 📁 assets/
-│   └── 📁 icons/              # 平台图标资源
-├── 📄 README.md               # 项目说明文档
-├── 📄 PROJECT_PLAN.md         # V1 项目计划
-└── 📄 PROJECT_PLAN_V2.md      # V2 功能规划
+│   ├── ⚙️ config.js          # 平台预设配置
+│   ├── 💾 storage.js         # localStorage 封装
+│   ├── ✨ effects.js        # 特效引擎（粒子效果）
+│   ├── 🚀 app.js            # 核心业务逻辑
+│   └── � poetry.js         # 诗意文案模块
+├── 📄 README.md              # 项目说明文档
+├── 📄 PROJECT_PLAN.md        # V1 项目计划
+├── 📄 PROJECT_PLAN_V2.md     # V2 功能规划
+└── 📄 LICENSE                # MIT 开源协议
 ```
 
 ---
 
 ## 🗺️ 路线图
 
-### ✅ 已实现 (V1)
-- [x] 平台卡片展示
+### ✅ 已实现
+- [x] 平台卡片展示（网格/列表双视图）
 - [x] 自定义链接编辑
 - [x] 深色/浅色主题切换
 - [x] 本地配置持久化
 - [x] 搜索过滤功能
+- [x] 分类筛选功能
+- [x] 收藏功能
+- [x] 添加/删除平台
+- [x] 数据导入导出
+- [x] PWA 离线支持
+- [x] 特效模式
+- [x] 快捷键支持 (Ctrl+K)
 
-### 🚧 开发中 (V2)
+### 🚧 规划中
 - [ ] 余额历史记录
 - [ ] 趋势图表展示
 - [ ] 低余额提醒
-- [ ] 数据导入导出
 - [ ] 批量操作功能
-- [ ] 快捷键支持
+- [ ] 拖拽排序
+- [ ] 使用统计
 
-### 📋 规划中 (V3)
+### 📋 未来展望
 - [ ] 云端同步
 - [ ] 自动余额抓取
 - [ ] 多设备同步
-- [ ] PWA 离线支持
+- [ ] 浏览器扩展版本
 
 ---
 
@@ -202,7 +219,7 @@ ai-platform-balance/
 <td align="center"><b>🌋 火山引擎</b></td>
 <td align="center"><b>🔍 DeepSeek</b></td>
 <td align="center"><b>🌙 月之暗面</b></td>
-<td align="center"><b>🧠 智谱 AI</b></td>
+<td align="center"><b>🧠 智谱</b></td>
 </tr>
 <tr>
 <td align="center"><b>☁️ 阿里百炼</b></td>
@@ -210,9 +227,15 @@ ai-platform-balance/
 <td align="center"><b>⚡ Minimax</b></td>
 <td align="center"><b>💎 硅基流动</b></td>
 </tr>
+<tr>
+<td align="center"><b>🛤️ OpenRouter</b></td>
+<td align="center"><b>💬 ChatGPT</b></td>
+<td align="center"><b>🤖 Grok</b></td>
+<td align="center"><b>✋ Manus</b></td>
+</tr>
 </table>
 
-> 持续更新中，欢迎 [提交 Issue](https://github.com/yourusername/ai-platform-balance/issues) 添加更多平台！
+> 持续更新中，默认预置 20+ 热门 AI 平台
 
 ---
 

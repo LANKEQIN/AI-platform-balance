@@ -196,6 +196,46 @@ const StorageManager = {
     },
 
     /**
+     * 验证导入的配置数据
+     * @param {Object} config 配置文件对象
+     * @returns {Object} 验证结果 { valid: boolean, message: string, data: Object }
+     */
+    validateImportConfig: function(config) {
+        if (!config || typeof config !== 'object') {
+            return { valid: false, message: '配置文件格式无效', data: null };
+        }
+
+        if (!config.platforms || !Array.isArray(config.platforms)) {
+            return { valid: false, message: '配置文件缺少 platforms 字段或格式错误', data: null };
+        }
+
+        const invalidPlatforms = [];
+        config.platforms.forEach((platform, index) => {
+            if (!platform.id || !platform.name) {
+                invalidPlatforms.push(index + 1);
+            }
+        });
+
+        if (invalidPlatforms.length > 0) {
+            return {
+                valid: false,
+                message: `第 ${invalidPlatforms.slice(0, 3).join(', ')}${invalidPlatforms.length > 3 ? '...' : ''} 个平台数据不完整（缺少必填字段）`,
+                data: null
+            };
+        }
+
+        return {
+            valid: true,
+            message: '验证通过',
+            data: {
+                platformsCount: config.platforms.length,
+                theme: config.theme || 'light',
+                viewMode: config.viewMode || 'grid'
+            }
+        };
+    },
+
+    /**
      * 导入配置
      * @param {string} jsonString JSON字符串
      * @returns {boolean} 是否成功
@@ -203,20 +243,45 @@ const StorageManager = {
     importConfig: function(jsonString) {
         try {
             const config = JSON.parse(jsonString);
-            if (config.platforms && Array.isArray(config.platforms)) {
-                this.savePlatforms(config.platforms);
-                if (config.theme) {
-                    this.saveTheme(config.theme);
-                }
-                if (config.viewMode) {
-                    this.saveViewMode(config.viewMode);
-                }
-                return true;
+            const validation = this.validateImportConfig(config);
+            if (!validation.valid) {
+                console.error('导入配置验证失败:', validation.message);
+                return false;
             }
-            return false;
+            this.savePlatforms(config.platforms);
+            if (config.theme) {
+                this.saveTheme(config.theme);
+            }
+            if (config.viewMode) {
+                this.saveViewMode(config.viewMode);
+            }
+            return true;
         } catch (error) {
             console.error('导入配置失败:', error);
             return false;
         }
+    },
+
+    /**
+     * 保存排序后的平台列表
+     * @param {Array} orderedIds 按顺序排列的平台ID数组
+     */
+    savePlatformOrder: function(orderedIds) {
+        const platforms = this.getPlatforms();
+        const platformMap = new Map(platforms.map(p => [p.id, p]));
+        const orderedPlatforms = [];
+
+        orderedIds.forEach(id => {
+            if (platformMap.has(id)) {
+                orderedPlatforms.push(platformMap.get(id));
+                platformMap.delete(id);
+            }
+        });
+
+        platformMap.forEach(platform => {
+            orderedPlatforms.push(platform);
+        });
+
+        return this.savePlatforms(orderedPlatforms);
     }
 };

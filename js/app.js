@@ -332,7 +332,8 @@ function createPlatformCard(platform) {
     const starredIcon = platform.starred ? '⭐' : '☆';
 
     return `
-        <div class="platform-card ${starredClass}" data-id="${platform.id}">
+        <div class="platform-card ${starredClass}" data-id="${platform.id}" draggable="true">
+            <div class="drag-handle" title="拖拽排序" aria-label="拖拽排序">⋮⋮</div>
             <div class="platform-card-header">
                 <div class="platform-icon">${platform.icon || '📦'}</div>
                 <span class="platform-name">${platform.name}</span>
@@ -407,6 +408,24 @@ function bindEvents() {
 
     // 添加弹窗事件
     setupAddModalEvents();
+
+    // 导入确认弹窗事件
+    setupImportConfirmModalEvents();
+
+    // 初始化拖拽排序
+    initDragAndDrop();
+}
+
+/**
+ * 设置导入确认弹窗事件
+ */
+function setupImportConfirmModalEvents() {
+    const modal = document.getElementById('importConfirmModal');
+    if (!modal) return;
+
+    document.getElementById('importConfirmBtn').addEventListener('click', confirmImport);
+    document.getElementById('importCancelBtn').addEventListener('click', cancelImport);
+    modal.querySelector('.modal-overlay').addEventListener('click', cancelImport);
 }
 
 /**
@@ -414,17 +433,104 @@ function bindEvents() {
  */
 function bindKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
-        // Ctrl/Cmd + K 聚焦搜索框
+        if (e.key === 'Escape') {
+            closeEditModal();
+            closeAddModal();
+            cancelImport();
+        }
+
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             document.getElementById('searchInput').focus();
         }
+    });
+}
 
-        // Esc 关闭弹窗
-        if (e.key === 'Escape') {
-            closeEditModal();
-            closeAddModal();
+/**
+ * 初始化拖拽排序
+ */
+function initDragAndDrop() {
+    const platformGrid = document.getElementById('platformGrid');
+    if (!platformGrid) return;
+
+    let draggedElement = null;
+    let draggedId = null;
+
+    platformGrid.addEventListener('dragstart', function(e) {
+        const card = e.target.closest('.platform-card');
+        if (!card) return;
+
+        draggedElement = card;
+        draggedId = card.dataset.id;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedId);
+    });
+
+    platformGrid.addEventListener('dragend', function(e) {
+        const card = e.target.closest('.platform-card');
+        if (!card) return;
+
+        card.classList.remove('dragging');
+        draggedElement = null;
+        draggedId = null;
+
+        document.querySelectorAll('.platform-card').forEach(c => {
+            c.classList.remove('drag-over');
+        });
+    });
+
+    platformGrid.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        const card = e.target.closest('.platform-card');
+        if (!card || card === draggedElement) return;
+
+        document.querySelectorAll('.platform-card').forEach(c => {
+            c.classList.remove('drag-over');
+        });
+
+        card.classList.add('drag-over');
+    });
+
+    platformGrid.addEventListener('dragleave', function(e) {
+        const card = e.target.closest('.platform-card');
+        if (!card) return;
+
+        if (!platformGrid.contains(e.relatedTarget)) {
+            card.classList.remove('drag-over');
         }
+    });
+
+    platformGrid.addEventListener('drop', function(e) {
+        e.preventDefault();
+
+        const targetCard = e.target.closest('.platform-card');
+        if (!targetCard || targetCard === draggedElement) return;
+
+        const targetId = targetCard.dataset.id;
+
+        const orderedIds = [];
+        document.querySelectorAll('.platform-card').forEach(card => {
+            orderedIds.push(card.dataset.id);
+        });
+
+        const draggedIndex = orderedIds.indexOf(draggedId);
+        const targetIndex = orderedIds.indexOf(targetId);
+
+        if (draggedIndex !== -1 && targetIndex !== -1) {
+            orderedIds.splice(draggedIndex, 1);
+            orderedIds.splice(targetIndex, 0, draggedId);
+
+            if (StorageManager.savePlatformOrder(orderedIds)) {
+                AppState.platforms = StorageManager.getPlatforms();
+                renderPlatforms();
+                ToastManager.show('排序已保存', 'success', 1500);
+            }
+        }
+
+        targetCard.classList.remove('drag-over');
     });
 }
 
@@ -607,23 +713,72 @@ function importConfig(event) {
     const reader = new FileReader();
     reader.onload = function(e) {
         const content = e.target.result;
-        if (StorageManager.importConfig(content)) {
-            AppState.platforms = StorageManager.getPlatforms();
-            initViewMode();
-            initTheme();
-            renderPlatforms();
-            ToastManager.show('配置已导入', 'success');
-        } else {
-            ToastManager.show('配置文件格式无效', 'error');
+        let config;
+        try {
+            config = JSON.parse(content);
+        } catch (err) {
+            ToastManager.show('配置文件格式无效，不是有效的JSON', 'error');
+            return;
         }
+
+        const validation = StorageManager.validateImportConfig(config);
+        if (!validation.valid) {
+            ToastManager.show(validation.message, 'error');
+            return;
+        }
+
+        openImportConfirmModal(validation.data, content);
     };
     reader.readAsText(file);
 
-    // 清空文件输入，允许重复选择同一文件
     event.target.value = '';
-
-    // 关闭下拉菜单
     document.getElementById('moreMenu').classList.remove('active');
+}
+
+/**
+ * 打开导入确认弹窗
+ * @param {Object} info 验证后的配置信息
+ * @param {string} content 原始JSON内容
+ */
+function openImportConfirmModal(info, content) {
+    const modal = document.getElementById('importConfirmModal');
+    if (!modal) return;
+
+    document.getElementById('importInfo').innerHTML = `
+        <p><strong>平台数量：</strong>${info.platformsCount} 个</p>
+        <p><strong>主题设置：</strong>${info.theme === 'dark' ? '🌙 深色模式' : '☀️ 浅色模式'}</p>
+        <p><strong>视图模式：</strong>${info.viewMode === 'list' ? '☰ 列表视图' : '▦ 网格视图'}</p>
+    `;
+
+    modal.classList.add('active');
+    modal.dataset.content = content;
+}
+
+/**
+ * 确认导入配置
+ */
+function confirmImport() {
+    const modal = document.getElementById('importConfirmModal');
+    const content = modal.dataset.content;
+
+    if (StorageManager.importConfig(content)) {
+        AppState.platforms = StorageManager.getPlatforms();
+        initViewMode();
+        initTheme();
+        renderPlatforms();
+        ToastManager.show('配置已导入', 'success');
+    } else {
+        ToastManager.show('导入失败，请检查配置文件', 'error');
+    }
+
+    modal.classList.remove('active');
+}
+
+/**
+ * 取消导入配置
+ */
+function cancelImport() {
+    document.getElementById('importConfirmModal').classList.remove('active');
 }
 
 /**
@@ -636,7 +791,6 @@ function resetConfig() {
     AppState.platforms = StorageManager.getPlatforms();
     renderPlatforms();
 
-    // 关闭下拉菜单
     document.getElementById('moreMenu').classList.remove('active');
     ToastManager.show('已重置为默认配置', 'success');
 }
