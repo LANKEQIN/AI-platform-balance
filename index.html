@@ -6,7 +6,7 @@
     <meta name="description" content="快速访问各AI平台的余额页面">
     <meta name="theme-color" content="#2563eb">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%236366f1' rx='20' width='100' height='100'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='white'%3E⚡%3C/text%3E%3C/svg%3E">
     <title>AI平台余额快捷入口</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,56 +16,61 @@
         <h1 class="header-title">AI平台余额快捷入口</h1>
         <div class="header-actions">
             <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="搜索平台... (Ctrl+K)" id="searchInput">
-                <button class="search-clear" id="searchClear" title="清空搜索">×</button>
+                <label for="searchInput" class="visually-hidden">搜索平台</label>
+                <input type="text" class="search-input" placeholder="搜索平台... (Ctrl+K)" id="searchInput" aria-label="搜索平台">
+                <button class="search-clear" id="searchClear" aria-label="清空搜索">×</button>
             </div>
-            <button class="btn btn-secondary" id="addPlatformBtn">+ 添加平台</button>
+            <button class="btn btn-secondary" id="addPlatformBtn" aria-label="添加新平台">+ 添加平台</button>
             <div class="dropdown">
-                <button class="btn btn-icon" id="moreBtn" title="更多操作">
-                    <span>⋮</span>
+                <button class="btn btn-icon" id="moreBtn" aria-label="更多操作" aria-haspopup="true" aria-expanded="false">
+                    <span aria-hidden="true">⋮</span>
                 </button>
-                <div class="dropdown-menu" id="moreMenu">
-                    <button class="dropdown-item" id="exportBtn">📤 导出配置</button>
-                    <button class="dropdown-item" id="importBtn">📥 导入配置</button>
-                    <button class="dropdown-item" id="resetBtn">🔄 重置配置</button>
+                <div class="dropdown-menu" id="moreMenu" role="menu" aria-label="更多操作菜单">
+                    <button class="dropdown-item" id="exportBtn" role="menuitem">导出配置</button>
+                    <button class="dropdown-item" id="importBtn" role="menuitem">导入配置</button>
+                    <button class="dropdown-item" id="resetBtn" role="menuitem">重置配置</button>
                 </div>
             </div>
-            <button class="btn btn-icon" id="themeToggle" title="切换主题">
-                <span class="theme-icon">🌙</span>
+            <button class="btn btn-icon" id="themeToggle" aria-label="切换深色/浅色主题">
+                <span class="theme-icon" aria-hidden="true">🌙</span>
             </button>
-            <button class="btn btn-icon" id="effectsToggle" title="切换特效模式">
-                <span class="effects-icon">⚡</span>
+            <button class="btn btn-icon" id="effectsToggle" aria-label="切换特效模式">
+                <span class="effects-icon" aria-hidden="true">⚡</span>
             </button>
         </div>
     </header>
 
     <!-- 工具栏 -->
-    <div class="toolbar">
-        <div class="filter-tabs" id="filterTabs">
-            <button class="filter-tab active" data-category="all">全部</button>
+    <nav class="toolbar" aria-label="筛选和视图选项">
+        <div class="filter-tabs" id="filterTabs" role="tablist" aria-label="平台分类筛选">
+            <button class="filter-tab active" data-category="all" role="tab" aria-selected="true">全部</button>
             <!-- 动态生成分类标签 -->
             <div id="categoryTabsContainer"></div>
-            <button class="filter-tab" data-category="starred">⭐ 已收藏</button>
+            <button class="filter-tab" data-category="starred" role="tab" aria-selected="false">已收藏</button>
         </div>
-        <div class="view-toggle">
-            <button class="view-btn active" data-view="grid" title="卡片视图">▦</button>
-            <button class="view-btn" data-view="list" title="列表视图">☰</button>
+        <div class="view-toggle" role="group" aria-label="视图切换">
+            <button class="view-btn active" data-view="grid" title="卡片视图" aria-label="卡片视图" aria-pressed="true">▦</button>
+            <button class="view-btn" data-view="list" title="列表视图" aria-label="列表视图" aria-pressed="false">☰</button>
         </div>
-    </div>
+    </nav>
 
     <!-- 隐藏的文件输入 -->
-    <input type="file" id="importFile" accept=".json" style="display: none;">
+    <input type="file" id="importFile" accept=".json" style="display: none;" aria-hidden="true">
 
     <!-- 主内容区域 -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
         <!-- 平台卡片容器 -->
-        <div class="platform-grid" id="platformGrid">
+        <div class="platform-grid" id="platformGrid" role="list" aria-label="AI平台列表">
             <!-- 平台卡片将通过JavaScript动态生成 -->
         </div>
 
         <!-- 空状态提示 -->
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <div class="empty-icon">📭</div>
+        <div class="empty-state" id="emptyState" style="display: none;" role="status" aria-live="polite">
+            <div class="empty-icon" aria-hidden="true">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </div>
             <p class="empty-title">暂无平台数据</p>
             <p class="empty-desc">点击下方按钮添加你的第一个AI平台</p>
             <button class="btn btn-primary" id="addFirstPlatformBtn">+ 添加第一个平台</button>
@@ -73,24 +78,24 @@
     </main>
 
     <!-- Toast 容器 -->
-    <div class="toast-container" id="toastContainer"></div>
+    <div class="toast-container" id="toastContainer" role="alert" aria-live="polite" aria-atomic="true"></div>
 
     <!-- 编辑弹窗 -->
-    <div class="modal" id="editModal">
+    <div class="modal" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle" aria-describedby="editModalDesc">
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">编辑平台</h2>
-                <button class="modal-close" id="modalClose">&times;</button>
+                <h2 class="modal-title" id="editModalTitle">编辑平台</h2>
+                <button class="modal-close" id="modalClose" aria-label="关闭弹窗">&times;</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="editModalDesc">
                 <div class="form-group">
                     <label for="editName">平台名称</label>
-                    <input type="text" id="editName" class="form-input" placeholder="请输入平台名称">
+                    <input type="text" id="editName" class="form-input" placeholder="请输入平台名称" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label for="editUrl">余额页面链接</label>
-                    <input type="url" id="editUrl" class="form-input" placeholder="请输入余额页面链接">
+                    <input type="url" id="editUrl" class="form-input" placeholder="请输入余额页面链接" autocomplete="url">
                     <p class="form-hint" id="editUrlHint" style="display: none;">默认链接: <span></span></p>
                 </div>
                 <div class="form-group">
@@ -117,21 +122,21 @@
     </div>
 
     <!-- 添加平台弹窗 -->
-    <div class="modal" id="addModal">
+    <div class="modal" id="addModal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">添加平台</h2>
-                <button class="modal-close" id="addModalClose">&times;</button>
+                <h2 class="modal-title" id="addModalTitle">添加平台</h2>
+                <button class="modal-close" id="addModalClose" aria-label="关闭弹窗">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="addName">平台名称 <span class="required">*</span></label>
-                    <input type="text" id="addName" class="form-input" placeholder="请输入平台名称">
+                    <label for="addName">平台名称 <span class="required" aria-hidden="true">*</span></label>
+                    <input type="text" id="addName" class="form-input" placeholder="请输入平台名称" autocomplete="off" required aria-required="true">
                 </div>
                 <div class="form-group">
-                    <label for="addUrl">余额页面链接 <span class="required">*</span></label>
-                    <input type="url" id="addUrl" class="form-input" placeholder="请输入余额页面链接">
+                    <label for="addUrl">余额页面链接 <span class="required" aria-hidden="true">*</span></label>
+                    <input type="url" id="addUrl" class="form-input" placeholder="请输入余额页面链接" autocomplete="url" required aria-required="true">
                 </div>
                 <div class="form-group">
                     <label for="addCategory">分类</label>
@@ -151,6 +156,9 @@
     <footer class="footer">
         <p>数据存储在本地浏览器中，清除浏览器数据会导致配置丢失</p>
     </footer>
+
+    <!-- 屏幕阅读器专用隐藏标签 -->
+    <span class="visually-hidden" id="screenReaderStatus" aria-live="polite" aria-atomic="true"></span>
 
     <!-- JavaScript文件引入 -->
     <script src="js/config.js"></script>
