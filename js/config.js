@@ -207,14 +207,6 @@ const DEFAULT_PLATFORMS = [
     }
 ];
 
-// 分类配置
-const CATEGORIES = [
-    { id: '大模型', name: '大模型' },
-    { id: 'AI平台', name: 'AI平台（C端网页）' },
-    { id: '图像生成', name: '图像生成' },
-    { id: '其他', name: '其他' }
-];
-
 // 分组配置
 const GROUPS = [
     { id: 'all', name: '全部', icon: '📋' },
@@ -223,6 +215,31 @@ const GROUPS = [
     { id: '图像生成', name: '图像生成', icon: '🎨' },
     { id: '其他', name: '其他', icon: '📦' }
 ];
+
+/**
+ * 获取有效的分类列表（用于下拉选项）
+ * 排除 'all'（全部）这个特殊选项
+ * @returns {Array} 有效的分类数组
+ */
+function getValidCategories() {
+    return GROUPS.filter(g => g.id !== 'all');
+}
+
+/**
+ * 工具函数：防抖
+ * @param {Function} func 要执行的函数
+ * @param {number} wait 等待时间（毫秒）
+ * @returns {Function} 防抖后的函数
+ */
+function debounce(func, wait = 300) {
+    let timeout = null;
+    return function(...args) {
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(this, args);
+        }, wait);
+    };
+}
 
 // localStorage键名常量
 const STORAGE_KEYS = {

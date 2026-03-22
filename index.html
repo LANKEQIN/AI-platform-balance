@@ -171,7 +171,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title" id="importConfirmTitle">确认导入配置</h2>
-                <button class="modal-close" id="importConfirmClose" aria-label="关闭弹窗" onclick="cancelImport()">&times;</button>
+                <button class="modal-close" id="importConfirmClose" aria-label="关闭弹窗">&times;</button>
             </div>
             <div class="modal-body">
                 <p class="import-warn">导入将覆盖当前的以下配置：</p>
@@ -193,10 +193,16 @@
     <!-- 屏幕阅读器专用隐藏标签 -->
     <span class="visually-hidden" id="screenReaderStatus" aria-live="polite" aria-atomic="true"></span>
 
-    <!-- JavaScript文件引入 -->
+    <!-- JavaScript文件引入（按依赖顺序） -->
     <script src="js/config.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/effects.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/validator.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/events.js"></script>
     <script src="js/app.js"></script>
 
     <!-- Service Worker 注册 -->
