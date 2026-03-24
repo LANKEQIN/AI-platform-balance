@@ -38,7 +38,7 @@ const EventHandler = {
 
             if (action === 'go') {
                 const url = button.dataset.url;
-                if (url) window.open(url, '_blank');
+                Utils.openUrlSafely(url);
             } else if (action === 'edit') {
                 ModalManager.openEditModal(button.dataset.id);
             } else if (action === 'star') {
@@ -254,7 +254,7 @@ const EventHandler = {
 
             selectedPlatforms.forEach(platform => {
                 const url = platform.customUrl || platform.url;
-                if (url) window.open(url, '_blank');
+                Utils.openUrlSafely(url);
             });
 
             ToastManager.show(`正在打开 ${selectedPlatforms.length} 个平台...`, 'success');
@@ -290,7 +290,26 @@ const EventHandler = {
 
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
-                document.getElementById('searchInput').focus();
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) searchInput.focus();
+            }
+
+            if (e.key === 'Tab' && !e.shiftKey && document.activeElement && document.activeElement.classList.contains('btn')) {
+                const buttons = Array.from(document.querySelectorAll('.btn'));
+                const currentIndex = buttons.indexOf(document.activeElement);
+                if (currentIndex !== -1 && currentIndex < buttons.length - 1) {
+                    buttons[currentIndex + 1].focus();
+                    e.preventDefault();
+                }
+            }
+
+            if (e.key === 'Tab' && e.shiftKey && document.activeElement && document.activeElement.classList.contains('btn')) {
+                const buttons = Array.from(document.querySelectorAll('.btn'));
+                const currentIndex = buttons.indexOf(document.activeElement);
+                if (currentIndex > 0) {
+                    buttons[currentIndex - 1].focus();
+                    e.preventDefault();
+                }
             }
         });
     }

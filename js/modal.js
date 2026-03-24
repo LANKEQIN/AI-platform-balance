@@ -158,14 +158,16 @@ const ModalManager = {
         const modal = document.getElementById('importConfirmModal');
         const content = modal.dataset.content;
 
-        if (StorageManager.importConfig(content)) {
+        const result = StorageManager.importConfig(content);
+        
+        if (result.success) {
             AppState.platforms = StorageManager.getPlatforms();
             initViewMode();
             initTheme();
             Renderer.renderPlatforms();
-            ToastManager.show('配置已导入', 'success');
+            ToastManager.show(`配置已导入，共 ${result.data.platformsCount} 个平台`, 'success');
         } else {
-            ToastManager.show('导入失败，请检查配置文件', 'error');
+            ToastManager.show(result.message, 'error');
         }
 
         modal.classList.remove('active');

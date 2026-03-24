@@ -238,16 +238,37 @@ const StorageManager = {
     /**
      * 导入配置
      * @param {string} jsonString JSON字符串
-     * @returns {boolean} 是否成功
+     * @returns {Object} 导入结果 { success: boolean, message: string, error: Error }
      */
     importConfig: function(jsonString) {
         try {
-            const config = JSON.parse(jsonString);
+            if (!jsonString || typeof jsonString !== 'string') {
+                return {
+                    success: false,
+                    message: '配置数据不能为空',
+                    error: null
+                };
+            }
+
+            const trimmed = jsonString.trim();
+            if (trimmed.length === 0) {
+                return {
+                    success: false,
+                    message: '配置数据不能为空',
+                    error: null
+                };
+            }
+
+            const config = JSON.parse(trimmed);
             const validation = this.validateImportConfig(config);
             if (!validation.valid) {
-                console.error('导入配置验证失败:', validation.message);
-                return false;
+                return {
+                    success: false,
+                    message: validation.message,
+                    error: null
+                };
             }
+
             this.savePlatforms(config.platforms);
             if (config.theme) {
                 this.saveTheme(config.theme);
@@ -255,10 +276,31 @@ const StorageManager = {
             if (config.viewMode) {
                 this.saveViewMode(config.viewMode);
             }
-            return true;
+
+            return {
+                success: true,
+                message: '配置导入成功',
+                data: {
+                    platformsCount: config.platforms.length,
+                    theme: config.theme || 'light',
+                    viewMode: config.viewMode || 'grid'
+                }
+            };
         } catch (error) {
+            let errorMessage = '导入配置失败';
+            
+            if (error instanceof SyntaxError) {
+                errorMessage = '配置文件格式无效，不是有效的JSON格式';
+            } else if (error.message) {
+                errorMessage = `导入失败: ${error.message}`;
+            }
+
             console.error('导入配置失败:', error);
-            return false;
+            return {
+                success: false,
+                message: errorMessage,
+                error: error
+            };
         }
     },
 

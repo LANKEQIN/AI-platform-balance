@@ -7,11 +7,11 @@
 const VisualEffects = {
     particlesContainer: null,
     cursorGlow: null,
-    particleCount: 30,  // 减少粒子数量提升性能
+    particleCount: 30,
     particles: [],
     enabled: true,
     intervalId: null,
-    boundHandlers: {},  // 保存绑定的事件处理函数引用
+    boundHandlers: {},
 
     /**
      * 初始化所有视觉效果
@@ -50,12 +50,11 @@ const VisualEffects = {
         this.cursorGlow.className = 'cursor-glow';
         document.body.appendChild(this.cursorGlow);
 
-        // 保存事件处理函数引用，以便后续移除
-        this.boundHandlers.cursorMove = this.throttle((e) => {
+        this.boundHandlers.cursorMove = Utils.throttle((e) => {
             if (!this.cursorGlow) return;
             this.cursorGlow.style.left = e.clientX + 'px';
             this.cursorGlow.style.top = e.clientY + 'px';
-        }, 16);  // ~60fps
+        }, 16);
 
         this.boundHandlers.cursorLeave = () => {
             if (this.cursorGlow) this.cursorGlow.style.opacity = '0';
@@ -194,22 +193,6 @@ const VisualEffects = {
     },
 
     /**
-     * 节流函数
-     * @param {Function} func 要执行的函数
-     * @param {number} limit 时间限制（毫秒）
-     */
-    throttle: function(func, limit) {
-        let inThrottle;
-        return function(...args) {
-            if (!inThrottle) {
-                func.apply(this, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    },
-
-    /**
      * 创建点击涟漪效果
      * @param {HTMLElement} element 目标元素
      * @param {MouseEvent} e 鼠标事件
@@ -321,7 +304,8 @@ const VisualEffects = {
             this.cursorGlow = null;
         }
 
-        // 清除粒子数组
+        // 清除粒子 DOM 元素并清空数组
+        this.particles.forEach(p => p.remove());
         this.particles = [];
 
         // 移除卡片特效
@@ -330,6 +314,28 @@ const VisualEffects = {
         });
 
         document.body.classList.add('effects-disabled');
+    },
+
+    /**
+     * 页面卸载时的清理
+     */
+    cleanup: function() {
+        this.disable();
+
+        if (this.boundHandlers.pageHide) {
+            window.removeEventListener('pagehide', this.boundHandlers.pageHide);
+            this.boundHandlers.pageHide = null;
+        }
+    },
+
+    /**
+     * 初始化页面卸载监听
+     */
+    initCleanup: function() {
+        this.boundHandlers.pageHide = () => {
+            this.cleanup();
+        };
+        window.addEventListener('pagehide', this.boundHandlers.pageHide);
     },
 
     /**
@@ -363,6 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (effectsMode === 'cool') {
         VisualEffects.init();
         VisualEffects.initButtonRipples();
+        VisualEffects.initCleanup();
     } else {
         document.body.classList.add('effects-disabled');
     }

@@ -75,7 +75,27 @@ const Renderer = {
         }
 
         emptyState.style.display = 'none';
-        platformGrid.innerHTML = filteredPlatforms.map(p => this.createPlatformCard(p)).join('');
+        
+        const fragment = document.createDocumentFragment();
+        filteredPlatforms.forEach((p, index) => {
+            const card = document.createElement('div');
+            card.innerHTML = this.createPlatformCard(p);
+            const node = card.firstElementChild;
+            node.style.animation = 'none';
+            node.dataset.animationIndex = index;
+            fragment.appendChild(node);
+        });
+        
+        platformGrid.innerHTML = '';
+        platformGrid.appendChild(fragment);
+        
+        requestAnimationFrame(() => {
+            const cards = platformGrid.querySelectorAll('.platform-card');
+            cards.forEach((card, index) => {
+                card.style.animation = `cardFloatIn var(--duration-slow) ease backwards`;
+                card.style.animationDelay = `${index * 0.05}s`;
+            });
+        });
     },
 
     /**
@@ -132,5 +152,38 @@ const Renderer = {
         if (themeIcon) {
             themeIcon.textContent = isDark ? '☀️' : '🌙';
         }
+    },
+
+    /**
+     * 更新批量工具栏状态
+     */
+    updateBatchToolbar() {
+        const toolbar = document.getElementById('batchToolbar');
+        const count = AppState.selectedIds.size;
+
+        if (count > 0) {
+            toolbar.classList.add('active');
+            document.getElementById('selectedCount').textContent = count;
+        } else {
+            toolbar.classList.remove('active');
+        }
+    },
+
+    /**
+     * 更新选择UI状态
+     */
+    updateSelectUI() {
+        const cards = document.querySelectorAll('.platform-card');
+        cards.forEach(card => {
+            const id = card.dataset.id;
+            const checkbox = card.querySelector('.card-checkbox');
+            if (AppState.selectedIds.has(id)) {
+                card.classList.add('selected');
+                checkbox.classList.add('checked');
+            } else {
+                card.classList.remove('selected');
+                checkbox.classList.remove('checked');
+            }
+        });
     }
 };

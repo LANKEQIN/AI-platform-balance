@@ -10,7 +10,7 @@ function initApp() {
     ToastManager.init();
 
     AppState.platforms = StorageManager.getPlatforms();
-    AppState.selectedIds = new Set(StorageManager.getSelectedIds());
+    AppState.selectedIds = new Set();
 
     initTheme();
     initViewMode();

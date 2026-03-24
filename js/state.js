@@ -52,31 +52,12 @@ const SelectStateManager = {
  * 更新批量工具栏状态
  */
 function updateBatchToolbar() {
-    const toolbar = document.getElementById('batchToolbar');
-    const count = AppState.selectedIds.size;
-
-    if (count > 0) {
-        toolbar.classList.add('active');
-        document.getElementById('selectedCount').textContent = count;
-    } else {
-        toolbar.classList.remove('active');
-    }
+    Renderer.updateBatchToolbar();
 }
 
 /**
  * 更新选择UI状态
  */
 function updateSelectUI() {
-    const cards = document.querySelectorAll('.platform-card');
-    cards.forEach(card => {
-        const id = card.dataset.id;
-        const checkbox = card.querySelector('.card-checkbox');
-        if (AppState.selectedIds.has(id)) {
-            card.classList.add('selected');
-            checkbox.classList.add('checked');
-        } else {
-            card.classList.remove('selected');
-            checkbox.classList.remove('checked');
-        }
-    });
+    Renderer.updateSelectUI();
 }

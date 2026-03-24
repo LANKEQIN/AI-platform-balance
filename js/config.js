@@ -225,22 +225,6 @@ function getValidCategories() {
     return GROUPS.filter(g => g.id !== 'all');
 }
 
-/**
- * 工具函数：防抖
- * @param {Function} func 要执行的函数
- * @param {number} wait 等待时间（毫秒）
- * @returns {Function} 防抖后的函数
- */
-function debounce(func, wait = 300) {
-    let timeout = null;
-    return function(...args) {
-        if (timeout) clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            func.apply(this, args);
-        }, wait);
-    };
-}
-
 // localStorage键名常量
 const STORAGE_KEYS = {
     PLATFORMS_CONFIG: 'ai_platforms_config',
