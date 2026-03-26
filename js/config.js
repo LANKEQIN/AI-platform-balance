@@ -8,7 +8,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'volcengine',
         name: '火山引擎',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://console.volcengine.com/finance/bill/detail',
         icon: '🌋',
         enabled: true
@@ -24,7 +24,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'deepseek',
         name: 'DeepSeek',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://platform.deepseek.com/usage',
         icon: '🔍',
         enabled: true
@@ -32,7 +32,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'deepseek-chat',
         name: 'DeepSeek Chat',
-        category: 'AI平台',
+        category: 'C端平台',
         url: 'https://chat.deepseek.com/',
         icon: '💬',
         enabled: true
@@ -40,7 +40,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'minimax-agent',
         name: 'MiniMax Agent',
-        category: 'AI平台',
+        category: 'C端平台',
         url: 'https://agent.minimaxi.com/',
         icon: '🤖',
         enabled: true
@@ -48,7 +48,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'zhipu-glm',
         name: '智谱GLM',
-        category: 'AI平台',
+        category: 'C端平台',
         url: 'https://chatglm.cn/main/alltoolsdetail?lang=zh',
         icon: '🧬',
         enabled: true
@@ -56,7 +56,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'moonshot',
         name: '月之暗面',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://platform.moonshot.cn/console/account',
         icon: '🌙',
         enabled: true
@@ -64,7 +64,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'zhipu',
         name: '智谱',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://www.bigmodel.cn/finance-center/finance/overview',
         icon: '🧠',
         enabled: true
@@ -72,7 +72,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'aliyun-bailian',
         name: '阿里百炼',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://billing-cost.console.aliyun.com/home',
         icon: '☁️',
         enabled: true
@@ -80,7 +80,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'modelscope',
         name: '魔搭社区',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://modelscope.cn/my/overview',
         icon: '🤝',
         enabled: true
@@ -88,7 +88,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'minimax',
         name: 'Minimax',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://platform.minimaxi.com/user-center/payment/balance',
         icon: '⚡',
         enabled: true
@@ -96,7 +96,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'siliconflow',
         name: '硅基流动（中国）',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://cloud.siliconflow.cn/me/expensebill',
         icon: '💎',
         enabled: true
@@ -104,7 +104,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'siliconflow-global',
         name: '硅基流动（国际）',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://cloud.siliconflow.com/models',
         icon: '💎',
         enabled: true
@@ -112,7 +112,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'openrouter',
         name: 'OpenRouter',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://openrouter.ai/',
         icon: '🛤️',
         enabled: true
@@ -120,7 +120,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'aihubmix',
         name: 'AIHubMix',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://aihubmix.com/models',
         icon: '🧩',
         enabled: true
@@ -128,7 +128,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'zhipu-open',
         name: '智谱开放平台',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://open.bigmodel.cn/pricing',
         icon: '🧠',
         enabled: true
@@ -136,7 +136,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'zhipu-global',
         name: '智谱国际',
-        category: '大模型',
+        category: '云服务商',
         url: 'https://z.ai/manage-apikey/apikey-list',
         icon: '🌐',
         enabled: true
@@ -152,7 +152,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'grok',
         name: 'Grok',
-        category: 'AI平台',
+        category: 'C端平台',
         url: 'https://grok.com/',
         icon: '🤖',
         enabled: true
@@ -160,7 +160,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'chatgpt',
         name: 'ChatGPT',
-        category: 'AI平台',
+        category: 'C端平台',
         url: 'https://chatgpt.com/',
         icon: '💬',
         enabled: true
@@ -168,7 +168,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'canirun',
         name: 'Canirun',
-        category: 'AI平台',
+        category: 'C端平台',
         url: 'https://www.canirun.ai/',
         icon: '🚀',
         enabled: true
@@ -176,7 +176,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'manus',
         name: 'Manus',
-        category: 'AI平台',
+        category: 'C端平台',
         url: 'https://manus.im/app',
         icon: '✋',
         enabled: true
@@ -200,7 +200,7 @@ const DEFAULT_PLATFORMS = [
     {
         id: 'huggingface',
         name: 'Hugging Face',
-        category: 'AI平台',
+        category: 'C端平台',
         url: 'https://huggingface.co',
         icon: '🤗',
         enabled: true
@@ -210,9 +210,8 @@ const DEFAULT_PLATFORMS = [
 // 分组配置
 const GROUPS = [
     { id: 'all', name: '全部', icon: '📋' },
-    { id: '大模型', name: '大模型', icon: '🤖' },
-    { id: 'AI平台', name: 'AI平台', icon: '💬' },
-    { id: '图像生成', name: '图像生成', icon: '🎨' },
+    { id: '云服务商', name: '云服务商', icon: '🤖' },
+    { id: 'C端平台', name: 'C端平台', icon: '💬' },
     { id: '其他', name: '其他', icon: '📦' }
 ];
 
@@ -236,4 +235,4 @@ const STORAGE_KEYS = {
 };
 
 // 配置版本号 - 修改平台列表时递增此版本号
-const CONFIG_VERSION = 3;
+const CONFIG_VERSION = 4;
