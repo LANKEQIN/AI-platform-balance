@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000
-  }
+  },
+  base: './'  // 使用相对路径，确保直接打开HTML文件也能正常加载
 })
