@@ -60,3 +60,4 @@ release/
 *.njsproj
 *.sln
 *.sw?
+start-dev.bat
