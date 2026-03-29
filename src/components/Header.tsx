@@ -8,8 +8,6 @@ interface HeaderProps {
   isSelectMode: boolean;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
-  effectsMode: 'cool' | 'simple';
-  onToggleEffects: () => void;
   onExport: () => void;
   onImport: (content: string) => void;
   onReset: () => void;
@@ -23,8 +21,6 @@ const Header: React.FC<HeaderProps> = ({
   isSelectMode,
   theme,
   onToggleTheme,
-  effectsMode,
-  onToggleEffects,
   onExport,
   onImport,
   onReset
@@ -167,16 +163,6 @@ const Header: React.FC<HeaderProps> = ({
         >
           <span className="theme-icon leading-none transition-transform duration-400 hover:rotate-180">
             {theme === 'dark' ? '☀️' : '🌙'}
-          </span>
-        </button>
-
-        <button
-          className="btn btn-icon"
-          onClick={onToggleEffects}
-          aria-label="切换特效模式"
-        >
-          <span className="effects-icon leading-none">
-            {effectsMode === 'cool' ? '⚡' : '✨'}
           </span>
         </button>
 

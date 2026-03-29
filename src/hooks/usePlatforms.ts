@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Platform } from '../types/platform';
 import { useStorage } from './useStorage';
 
@@ -6,6 +6,12 @@ export function usePlatforms() {
   const storage = useStorage();
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [loading, setLoading] = useState(true);
+  const platformsRef = useRef<Platform[]>([]);
+
+  // 同步 ref 以避免回调依赖 platforms 导致的重新渲染
+  useEffect(() => {
+    platformsRef.current = platforms;
+  }, [platforms]);
 
   // 初始化加载平台
   useEffect(() => {
@@ -21,26 +27,29 @@ export function usePlatforms() {
 
   // 更新单个平台
   const updatePlatform = useCallback((platformId: string, updates: Partial<Platform>) => {
-    const newPlatforms = platforms.map(p => 
+    const currentPlatforms = platformsRef.current;
+    const newPlatforms = currentPlatforms.map(p => 
       p.id === platformId ? { ...p, ...updates } : p
     );
     saveAndUpdate(newPlatforms);
-  }, [platforms, saveAndUpdate]);
+  }, [saveAndUpdate]);
 
   // 添加平台
   const addPlatform = useCallback((platform: Omit<Platform, 'id' | 'enabled'>) => {
+    const currentPlatforms = platformsRef.current;
     const newPlatform: Platform = {
       ...platform,
       id: 'custom_' + Date.now(),
       enabled: true
     };
-    saveAndUpdate([...platforms, newPlatform]);
-  }, [platforms, saveAndUpdate]);
+    saveAndUpdate([...currentPlatforms, newPlatform]);
+  }, [saveAndUpdate]);
 
   // 删除平台
   const deletePlatform = useCallback((platformId: string) => {
-    saveAndUpdate(platforms.filter(p => p.id !== platformId));
-  }, [platforms, saveAndUpdate]);
+    const currentPlatforms = platformsRef.current;
+    saveAndUpdate(currentPlatforms.filter(p => p.id !== platformId));
+  }, [saveAndUpdate]);
 
   // 重置为默认
   const resetToDefault = useCallback((): Platform[] => {

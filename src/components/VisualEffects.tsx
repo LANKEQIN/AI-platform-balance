@@ -1,69 +1,40 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
-interface VisualEffectsProps {
-  enabled: boolean;
-}
-
-const VisualEffects: React.FC<VisualEffectsProps> = ({ enabled }) => {
+const VisualEffects: React.FC = () => {
   const particlesContainerRef = useRef<HTMLDivElement>(null);
   const cursorGlowRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number | null>(null);
-  const particlesRef = useRef<HTMLDivElement[]>([]);
-
-  const [particles, setParticles] = useState<Array<{ id: number; left: number; top: number; size: number; duration: number; delay: number; color: string }>>([]);
-
-  const PARTICLE_COUNT = 30;
-
-  // 生成随机粒子
-  const generateParticle = useCallback((randomPosition = false) => {
+  const rippleContainerRef = useRef<HTMLDivElement>(null);
+  
+  const [particles] = useState<Array<{ 
+    id: number; 
+    left: number; 
+    top: number; 
+    size: number; 
+    duration: number; 
+    delay: number; 
+    color: string;
+  }>>(() => {
     const colors = [
       'rgba(103, 232, 249, 0.5)',
-      'rgba(20, 184, 166, 0.5)'
+      'rgba(20, 184, 166, 0.5)',
+      'rgba(6, 182, 212, 0.4)',
+      'rgba(34, 211, 238, 0.4)'
     ];
-    return {
-      id: Date.now() + Math.random(),
+    return Array.from({ length: 40 }, (_, i) => ({
+      id: i,
       left: Math.random() * 100,
-      top: randomPosition ? Math.random() * 100 : 110,
+      top: Math.random() * 100,
       size: Math.random() * 3 + 2,
-      duration: Math.random() * 12 + 15,
-      delay: Math.random() * 5,
+      duration: Math.random() * 20 + 25,
+      delay: Math.random() * 10,
       color: colors[Math.floor(Math.random() * colors.length)]
-    };
-  }, []);
-
-  // 初始化粒子
-  useEffect(() => {
-    if (!enabled) {
-      setParticles([]);
-      return;
-    }
-
-    const initialParticles = Array.from({ length: PARTICLE_COUNT }, () => generateParticle(true));
-    setParticles(initialParticles);
-  }, [enabled, generateParticle]);
-
-  // 定期添加新粒子
-  useEffect(() => {
-    if (!enabled) return;
-
-    const interval = setInterval(() => {
-      setParticles(prev => {
-        if (prev.length < PARTICLE_COUNT) {
-          return [...prev, generateParticle(false)];
-        }
-        return prev;
-      });
-    }, 800);
-
-    return () => clearInterval(interval);
-  }, [enabled, generateParticle]);
+    }));
+  });
 
   // 鼠标追踪光效
   useEffect(() => {
-    if (!enabled) return;
-
     let lastMoveTime = 0;
-    const THROTTLE_MS = 16;
+    const THROTTLE_MS = 32;
 
     const handleMouseMove = (e: MouseEvent) => {
       const now = Date.now();
@@ -98,14 +69,39 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ enabled }) => {
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mouseenter', handleMouseEnter);
     };
-  }, [enabled]);
+  }, []);
+
+  // 点击涟漪效果
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const ripple = document.createElement('div');
+      ripple.style.left = e.clientX + 'px';
+      ripple.style.top = e.clientY + 'px';
+      ripple.style.width = '20px';
+      ripple.style.height = '20px';
+      ripple.style.background = 'radial-gradient(circle, rgba(20, 184, 166, 0.5) 0%, transparent 70%)';
+      ripple.style.borderRadius = '50%';
+      ripple.style.position = 'fixed';
+      ripple.style.pointerEvents = 'none';
+      ripple.style.transform = 'translate(-50%, -50%) scale(0)';
+      ripple.style.animation = 'rippleExpand 0.6s ease-out forwards';
+      ripple.style.zIndex = '9999';
+      ripple.style.opacity = '1';
+
+      if (rippleContainerRef.current) {
+        rippleContainerRef.current.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
 
   // 卡片3D效果
   useEffect(() => {
-    if (!enabled) return;
-
     let lastCardMoveTime = 0;
-    const THROTTLE_MS = 16;
+    const THROTTLE_MS = 32;
 
     const handleCardHover = (e: MouseEvent) => {
       const now = Date.now();
@@ -141,9 +137,7 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ enabled }) => {
       document.removeEventListener('mousemove', handleCardHover);
       document.removeEventListener('mouseleave', handleCardLeave, true);
     };
-  }, [enabled]);
-
-  if (!enabled) return null;
+  }, []);
 
   return (
     <>
@@ -165,7 +159,6 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ enabled }) => {
         {particles.map((particle) => (
           <div
             key={particle.id}
-            className="particle"
             style={{
               position: 'absolute',
               left: `${particle.left}%`,
@@ -175,10 +168,8 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ enabled }) => {
               background: particle.color,
               borderRadius: '50%',
               animation: `particleFloat ${particle.duration}s linear ${particle.delay}s infinite`,
-              pointerEvents: 'none'
-            }}
-            onAnimationEnd={() => {
-              setParticles(prev => prev.filter(p => p.id !== particle.id));
+              pointerEvents: 'none',
+              boxShadow: `0 0 ${particle.size * 1.5}px ${particle.color}`
             }}
           />
         ))}
@@ -187,7 +178,6 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ enabled }) => {
       {/* 鼠标追踪光效 */}
       <div
         ref={cursorGlowRef}
-        className="cursor-glow"
         style={{
           position: 'fixed',
           width: '400px',
@@ -198,7 +188,42 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ enabled }) => {
           transform: 'translate(-50%, -50%)',
           zIndex: 1,
           opacity: 0,
-          transition: 'opacity 0.3s ease'
+          transition: 'opacity 0.5s ease',
+          mixBlendMode: 'screen'
+        }}
+      />
+
+      {/* 点击涟漪容器 */}
+      <div
+        ref={rippleContainerRef}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          pointerEvents: 'none',
+          zIndex: 9998,
+          overflow: 'hidden'
+        }}
+      />
+
+      {/* 背景极光效果 */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          pointerEvents: 'none',
+          zIndex: -1,
+          background: `
+            radial-gradient(ellipse at 10% 10%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+            radial-gradient(ellipse at 90% 90%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 80%, rgba(34, 211, 238, 0.08) 0%, transparent 40%)
+          `,
+          animation: 'auroraPulse 20s ease-in-out infinite alternate'
         }}
       />
 
@@ -207,17 +232,34 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ enabled }) => {
         @keyframes particleFloat {
           0% {
             transform: translateY(0) rotate(0deg);
-            opacity: 0;
+            opacity: 0.3;
           }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
+          50% {
+            opacity: 0.8;
           }
           100% {
             transform: translateY(-120vh) rotate(360deg);
+            opacity: 0.3;
+          }
+        }
+
+        @keyframes rippleExpand {
+          0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(12);
             opacity: 0;
+          }
+        }
+
+        @keyframes auroraPulse {
+          0% {
+            filter: hue-rotate(0deg);
+          }
+          100% {
+            filter: hue-rotate(40deg);
           }
         }
       `}</style>

@@ -30,7 +30,6 @@ function App() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [effectsMode, setEffectsMode] = useState<'cool' | 'simple'>('simple');
 
   // 检查是否已访问过应用
   useEffect(() => {
@@ -51,26 +50,10 @@ function App() {
     setViewMode(savedViewMode);
   }, [storage]);
 
-  // 初始化特效模式
-  useEffect(() => {
-    const savedEffectsMode = storage.getEffectsMode();
-    setEffectsMode(savedEffectsMode);
-  }, [storage]);
-
   // 保存视图模式
   useEffect(() => {
     storage.saveViewMode(viewMode);
   }, [viewMode, storage]);
-
-  // 保存特效模式
-  useEffect(() => {
-    storage.saveEffectsMode(effectsMode);
-  }, [effectsMode, storage]);
-
-  // 切换特效模式
-  const toggleEffects = useCallback(() => {
-    setEffectsMode(prev => prev === 'cool' ? 'simple' : 'cool');
-  }, []);
 
   // 键盘快捷键
   useEffect(() => {
@@ -240,8 +223,8 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* 特效组件 */}
-      <VisualEffects enabled={effectsMode === 'cool'} />
+      {/* 特效组件 - 始终启用 */}
+      <VisualEffects />
 
       {/* 头部 */}
       <Header
@@ -257,8 +240,6 @@ function App() {
         isSelectMode={isSelectMode}
         theme={theme}
         onToggleTheme={toggleTheme}
-        effectsMode={effectsMode}
-        onToggleEffects={toggleEffects}
         onExport={handleExport}
         onImport={handleImport}
         onReset={handleReset}
@@ -291,13 +272,14 @@ function App() {
               role="list"
               aria-label="AI平台列表"
             >
-              {filteredPlatforms.map((platform) => (
+              {filteredPlatforms.map((platform, index) => (
                 <PlatformCard
                   key={platform.id}
                   platform={platform}
                   viewMode={viewMode}
                   isSelectMode={isSelectMode}
                   isSelected={selectedIds.has(platform.id)}
+                  index={index}
                   onSelect={handleSelect}
                   onStar={handleStar}
                   onEdit={handleEdit}
