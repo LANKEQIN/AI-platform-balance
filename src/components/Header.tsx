@@ -2,17 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 
 interface HeaderProps {
   searchKeyword: string;
-  onSearchChange: (keyword: string) =&gt; void;
-  onAddPlatform: () =&gt; void;
-  onToggleSelectMode: () =&gt; void;
+  onSearchChange: (keyword: string) => void;
+  onAddPlatform: () => void;
+  onToggleSelectMode: () => void;
   isSelectMode: boolean;
   theme: 'light' | 'dark';
-  onToggleTheme: () =&gt; void;
+  onToggleTheme: () => void;
   effectsMode: 'cool' | 'simple';
-  onToggleEffects: () =&gt; void;
-  onExport: () =&gt; void;
-  onImport: (content: string) =&gt; void;
-  onReset: () =&gt; void;
+  onToggleEffects: () => void;
+  onExport: () => void;
+  onImport: (content: string) => void;
+  onReset: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -28,12 +28,11 @@ const Header: React.FC<HeaderProps> = ({
   onExport,
   onImport,
   onReset
-}) =&gt; {
+}) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 点击外部关闭下拉菜单
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -60,7 +59,6 @@ const Header: React.FC<HeaderProps> = ({
       };
       reader.readAsText(file);
     }
-    // 清空input以便再次选择同一文件
     e.target.value = '';
   };
 
@@ -70,7 +68,6 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="glass backdrop-blur-xl py-4 px-6 shadow-md border-b border-white/20 sticky top-0 z-[100] flex justify-between items-center flex-wrap gap-4 transition-all duration-250">
-      {/* 顶部光泽线 */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
 
       <h1 className="text-2xl font-bold bg-gradient-to-br from-white via-indigo-100 to-indigo-200 bg-clip-text text-transparent">
@@ -78,7 +75,6 @@ const Header: React.FC<HeaderProps> = ({
       </h1>
 
       <div className="flex items-center gap-2">
-        {/* 搜索框 */}
         <div className="relative flex items-center">
           <label htmlFor="searchInput" className="sr-only">搜索平台</label>
           <input
@@ -101,7 +97,6 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* 添加平台按钮 */}
         <button
           className="btn btn-secondary"
           onClick={onAddPlatform}
@@ -110,7 +105,6 @@ const Header: React.FC<HeaderProps> = ({
           + 添加平台
         </button>
 
-        {/* 批量选择按钮 */}
         <button
           className={`btn ${isSelectMode ? 'btn-primary' : 'btn-secondary'}`}
           onClick={onToggleSelectMode}
@@ -119,7 +113,6 @@ const Header: React.FC<HeaderProps> = ({
           {isSelectMode ? '✓ 已选择' : '☑️ 批量选择'}
         </button>
 
-        {/* 更多操作下拉菜单 */}
         <div className="relative" ref={dropdownRef}>
           <button
             className="btn btn-icon"
@@ -167,7 +160,6 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* 主题切换按钮 */}
         <button
           className="btn btn-icon"
           onClick={onToggleTheme}
@@ -178,7 +170,6 @@ const Header: React.FC<HeaderProps> = ({
           </span>
         </button>
 
-        {/* 特效切换按钮 */}
         <button
           className="btn btn-icon"
           onClick={onToggleEffects}
@@ -189,7 +180,6 @@ const Header: React.FC<HeaderProps> = ({
           </span>
         </button>
 
-        {/* 隐藏的文件输入 */}
         <input
           ref={fileInputRef}
           type="file"

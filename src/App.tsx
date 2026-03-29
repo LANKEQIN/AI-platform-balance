@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { usePlatforms } from './hooks/usePlatforms';
 import { useToast } from './hooks/useToast';
@@ -15,7 +15,6 @@ import ToastContainer from './components/ToastContainer';
 import Footer from './components/Footer';
 import LandingPage from './components/LandingPage';
 import VisualEffects from './components/VisualEffects';
-import PoetryDisplay from './components/PoetryDisplay';
 
 function App() {
   // Hooks
@@ -28,10 +27,10 @@ function App() {
   const [showLanding, setShowLanding] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [currentCategory, setCurrentCategory] = useState('all');
-  const [viewMode, setViewMode] = useState&lt;'grid' | 'list'&gt;('grid');
-  const [selectedIds, setSelectedIds] = useState&lt;Set&lt;string&gt;&gt;(new Set());
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [effectsMode, setEffectsMode] = useState&lt;'cool' | 'simple'&gt;('simple');
+  const [effectsMode, setEffectsMode] = useState<'cool' | 'simple'>('simple');
 
   // 检查是否已访问过应用
   useEffect(() => {
@@ -47,30 +46,30 @@ function App() {
   const [editingPlatform, setEditingPlatform] = useState<Platform | null>(null);
 
   // 初始化视图模式
-  useEffect(() =&gt; {
+  useEffect(() => {
     const savedViewMode = storage.getViewMode();
     setViewMode(savedViewMode);
   }, [storage]);
 
   // 初始化特效模式
-  useEffect(() =&gt; {
+  useEffect(() => {
     const savedEffectsMode = storage.getEffectsMode();
     setEffectsMode(savedEffectsMode);
   }, [storage]);
 
   // 保存视图模式
-  useEffect(() =&gt; {
+  useEffect(() => {
     storage.saveViewMode(viewMode);
   }, [viewMode, storage]);
 
   // 保存特效模式
-  useEffect(() =&gt; {
+  useEffect(() => {
     storage.saveEffectsMode(effectsMode);
   }, [effectsMode, storage]);
 
   // 切换特效模式
-  const toggleEffects = useCallback(() =&gt; {
-    setEffectsMode(prev =&gt; prev === 'cool' ? 'simple' : 'cool');
+  const toggleEffects = useCallback(() => {
+    setEffectsMode(prev => prev === 'cool' ? 'simple' : 'cool');
   }, []);
 
   // 键盘快捷键
@@ -159,7 +158,7 @@ function App() {
 
   // 切换选择
   const handleSelect = useCallback((platformId: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev: Set<string>) => {
       const newSet = new Set(prev);
       if (newSet.has(platformId)) {
         newSet.delete(platformId);
@@ -177,7 +176,7 @@ function App() {
 
   // 批量打开
   const handleBatchOpen = useCallback(() => {
-    selectedIds.forEach(id => {
+    selectedIds.forEach((id: string) => {
       const platform = platforms.find(p => p.id === id);
       if (platform) {
         const url = platform.customUrl || platform.url;
@@ -276,9 +275,6 @@ function App() {
       {/* 主内容 */}
       <main className="flex-1 px-6 pb-24">
         <div className="max-w-[1400px] mx-auto">
-          {/* 诗词/名言显示 */}
-          <PoetryDisplay />
-
           {loading ? (
             <div className="text-center py-12 text-white/70">
               加载中...
@@ -295,7 +291,7 @@ function App() {
               role="list"
               aria-label="AI平台列表"
             >
-              {filteredPlatforms.map((platform, index) => (
+              {filteredPlatforms.map((platform) => (
                 <PlatformCard
                   key={platform.id}
                   platform={platform}

@@ -1,15 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { poetryDatabase, quotesDatabase, PoetryItem } from '../config/poetry';
 
 interface LandingPageProps {
   onStart: () => void;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
+  // 古诗词状态
+  const [currentPoetry, setCurrentPoetry] = useState<PoetryItem>();
+  const [poetryIndex, setPoetryIndex] = useState<number>(0);
+  
+  // 名人名言状态
+  const [currentQuote, setCurrentQuote] = useState<PoetryItem>();
+  const [quoteIndex, setQuoteIndex] = useState<number>(0);
+
+  // 获取随机古诗词
+  const getRandomPoetry = useCallback((avoidIndex?: number) => {
+    let newIndex;
+    do {
+      newIndex = Math.floor(Math.random() * poetryDatabase.length);
+    } while (poetryDatabase.length > 1 && newIndex === avoidIndex);
+
+    setPoetryIndex(newIndex);
+    setCurrentPoetry(poetryDatabase[newIndex]);
+  }, []);
+
+  // 获取随机名人名言
+  const getRandomQuote = useCallback((avoidIndex?: number) => {
+    let newIndex;
+    do {
+      newIndex = Math.floor(Math.random() * quotesDatabase.length);
+    } while (quotesDatabase.length > 1 && newIndex === avoidIndex);
+
+    setQuoteIndex(newIndex);
+    setCurrentQuote(quotesDatabase[newIndex]);
+  }, []);
+
+  // 初始化随机内容
+  useEffect(() => {
+    const randomPoetryIndex = Math.floor(Math.random() * poetryDatabase.length);
+    const randomQuoteIndex = Math.floor(Math.random() * quotesDatabase.length);
+    
+    setPoetryIndex(randomPoetryIndex);
+    setCurrentPoetry(poetryDatabase[randomPoetryIndex]);
+    
+    setQuoteIndex(randomQuoteIndex);
+    setCurrentQuote(quotesDatabase[randomQuoteIndex]);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero区域 */}
       <section className="flex-1 flex items-center justify-center px-6 py-20">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
           {/* 主标题 */}
           <div className="mb-8">
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-br from-white via-indigo-100 to-cyan-200 bg-clip-text text-transparent">
@@ -23,13 +66,88 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           </div>
 
           {/* 主要CTA按钮 */}
-          <div className="mb-16">
+          <div className="mb-12">
             <button
               onClick={onStart}
               className="btn btn-primary text-lg px-10 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
             >
               🚀 立即开始
             </button>
+          </div>
+
+          {/* 古诗词和名人名言卡片 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+            {/* 古诗词卡片 */}
+            <div className="glass backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:border-white/30 transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl opacity-70">📜</span>
+                  <span className="text-white font-semibold">古诗词</span>
+                </div>
+                <button
+                  onClick={() => getRandomPoetry(poetryIndex)}
+                  className="btn btn-icon text-sm"
+                  aria-label="刷新古诗词"
+                  title="换一首"
+                >
+                  🔄
+                </button>
+              </div>
+
+              {currentPoetry && (
+                <div className="text-center">
+                  <p className="text-xl font-medium mb-2 bg-gradient-to-r from-white via-cyan-100 to-cyan-200 bg-clip-text text-transparent">
+                    {currentPoetry.line1}
+                  </p>
+                  {currentPoetry.line2 && (
+                    <p className="text-lg text-white/80 mb-4">
+                      {currentPoetry.line2}
+                    </p>
+                  )}
+                  {currentPoetry.author && (
+                    <p className="text-sm text-white/50 italic">
+                      —— {currentPoetry.author}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* 名人名言卡片 */}
+            <div className="glass backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:border-white/30 transition-all duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl opacity-70">💬</span>
+                  <span className="text-white font-semibold">名人名言</span>
+                </div>
+                <button
+                  onClick={() => getRandomQuote(quoteIndex)}
+                  className="btn btn-icon text-sm"
+                  aria-label="刷新名人名言"
+                  title="换一条"
+                >
+                  🔄
+                </button>
+              </div>
+
+              {currentQuote && (
+                <div className="text-center">
+                  <p className="text-xl font-medium mb-2 bg-gradient-to-r from-white via-pink-100 to-purple-200 bg-clip-text text-transparent">
+                    {currentQuote.line1}
+                  </p>
+                  {currentQuote.line2 && (
+                    <p className="text-lg text-white/80 mb-4">
+                      {currentQuote.line2}
+                    </p>
+                  )}
+                  {currentQuote.author && (
+                    <p className="text-sm text-white/50 italic">
+                      —— {currentQuote.author}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 功能特性 */}
