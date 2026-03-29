@@ -1,12 +1,17 @@
 {
   "name": "ai-platform-balance",
+  "productName": "API余额管理工具",
   "private": true,
   "version": "2.0.0",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "npm run build && electron-builder"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -17,8 +22,13 @@
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^41.1.0",
+    "electron-builder": "^26.8.1",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "wait-on": "^9.0.4"
   }
 }

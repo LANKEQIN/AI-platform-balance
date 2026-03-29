@@ -50,6 +50,10 @@ tsconfig.tsbuildinfo
 coverage/
 .nyc_output/
 
+# Electron
+electron-builder.json
+release/
+
 # 其他
 *.suo
 *.ntvs*
