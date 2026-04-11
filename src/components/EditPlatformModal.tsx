@@ -22,6 +22,7 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('云服务商');
   const [starred, setStarred] = useState(false);
+  const [note, setNote] = useState('');
   const [showReset, setShowReset] = useState(false);
 
   // 有效的分类选项
@@ -34,6 +35,7 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
       setUrl(platform.customUrl || platform.url);
       setCategory(platform.category);
       setStarred(platform.starred || false);
+      setNote(platform.note || '');
 
       // 检查是否有默认平台，且用户使用了自定义链接
       const defaultPlatform = DEFAULT_PLATFORMS.find(p => p.id === platform.id);
@@ -63,7 +65,8 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
       name,
       category,
       customUrl,
-      starred
+      starred,
+      note: note || undefined
     };
 
     onSave(updatedPlatform);
@@ -183,6 +186,21 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
             />
             <span className="text-white">收藏此平台</span>
           </label>
+        </div>
+
+        {/* 备注 */}
+        <div>
+          <label htmlFor="editNote" className="block mb-1 text-sm font-semibold text-white">
+            备注
+          </label>
+          <textarea
+            id="editNote"
+            className="form-input resize-none"
+            placeholder="添加备注信息，例如：这个月还有XX额度..."
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={3}
+          />
         </div>
       </div>
     </Modal>

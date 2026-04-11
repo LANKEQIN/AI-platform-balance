@@ -8,6 +8,7 @@ export interface Platform {
   enabled: boolean;
   customUrl?: string;
   starred?: boolean;
+  note?: string;
 }
 
 // localStorage键名
@@ -22,7 +23,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 // 配置版本号
-export const CONFIG_VERSION = 4;
+export const CONFIG_VERSION = 5;
 
 // 分类配置
 export const CATEGORIES: Array<{ id: string; name: string; icon: string }> = [

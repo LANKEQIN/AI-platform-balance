@@ -4,13 +4,14 @@ import Modal from './Modal';
 interface AddPlatformModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (platform: { name: string; url: string; category: string; icon: string }) => void;
+  onAdd: (platform: { name: string; url: string; category: string; icon: string; note?: string }) => void;
 }
 
 const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, onAdd }) => {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('云服务商');
+  const [note, setNote] = useState('');
 
   // 有效的分类选项
   const categories = ['云服务商', 'C端平台', '其他'];
@@ -21,6 +22,7 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, on
       setName('');
       setUrl('');
       setCategory('云服务商');
+      setNote('');
     }
   }, [isOpen]);
 
@@ -33,7 +35,8 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, on
       name: name.trim(),
       url: url.trim(),
       category,
-      icon: '🔗' // 默认图标
+      icon: '🔗', // 默认图标
+      note: note.trim() || undefined
     });
     onClose();
   };
@@ -108,6 +111,21 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, on
               </option>
             ))}
           </select>
+        </div>
+
+        {/* 备注 */}
+        <div>
+          <label htmlFor="addNote" className="block mb-1 text-sm font-semibold text-white">
+            备注
+          </label>
+          <textarea
+            id="addNote"
+            className="form-input resize-none"
+            placeholder="添加备注信息，例如：这个月还有XX额度..."
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={3}
+          />
         </div>
       </div>
     </Modal>

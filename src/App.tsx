@@ -28,7 +28,7 @@ function App() {
   const [showLanding, setShowLanding] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [currentCategory, setCurrentCategory] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => storage.getViewMode());
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -60,16 +60,10 @@ function App() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingPlatform, setEditingPlatform] = useState<Platform | null>(null);
 
-  // 初始化视图模式
-  useEffect(() => {
-    const savedViewMode = storage.getViewMode();
-    setViewMode(savedViewMode);
-  }, [storage]);
-
   // 保存视图模式
   useEffect(() => {
     storage.saveViewMode(viewMode);
-  }, [viewMode, storage]);
+  }, [viewMode]);
 
   // 键盘快捷键
   useEffect(() => {
@@ -248,8 +242,8 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* 特效组件 - 始终启用 */}
-      <VisualEffects />
+      {/* 特效组件 - 暂时禁用以测试性能 */}
+      {/* <VisualEffects /> */}
 
       {/* 头部 */}
       <Header
@@ -276,6 +270,7 @@ function App() {
         onCategoryChange={setCurrentCategory}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        theme={theme}
       />
 
       {/* 主内容 */}
@@ -294,6 +289,9 @@ function App() {
                   ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
                   : 'grid-cols-1'
               }`}
+              style={{
+                minHeight: '200px'
+              }}
               role="list"
               aria-label="AI平台列表"
             >
