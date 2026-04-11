@@ -299,6 +299,17 @@ body::after {
   }
 }
 
+@keyframes fadeInUpStagger {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes pulseSoft {
   0%, 100% {
     opacity: 1;
@@ -319,9 +330,66 @@ body::after {
   }
 }
 
+/* 按钮闪光扫过效果 */
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  20%, 100% {
+    left: 150%;
+  }
+}
+
+/* 按钮内发光脉冲 */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(20, 184, 166, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.6), 0 0 30px rgba(6, 182, 212, 0.4);
+  }
+}
+
+/* 按钮悬浮弹跳效果 */
+@keyframes bounceSoft {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* 卡片悬浮呼吸光效 */
+@keyframes cardBreath {
+  0%, 100% {
+    box-shadow: 0 4px 16px rgba(31, 38, 135, 0.12);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(31, 38, 135, 0.12), 0 0 30px var(--card-glow-color, rgba(20, 184, 166, 0.3));
+  }
+}
+
+/* 图标旋转摇摆效果 */
+@keyframes iconWobble {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+}
+
 /* 动画实用类 */
 .animate-fade-in-up {
   animation: fadeInUp var(--duration-normal) ease-out;
+}
+
+.animate-fade-in-up-stagger {
+  animation: fadeInUpStagger 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .animate-pulse-soft {
@@ -330,6 +398,63 @@ body::after {
 
 .animate-scale-in {
   animation: scaleIn var(--duration-normal) ease-out;
+}
+
+.animate-card-breath {
+  animation: cardBreath 3s ease-in-out infinite;
+}
+
+.animate-icon-wobble:hover {
+  animation: iconWobble 0.4s ease-in-out;
+}
+
+/* 增强按钮样式 */
+.btn {
+  /* 闪光效果层 */
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+  pointer-events: none;
+}
+
+.btn:hover::before {
+  left: 100%;
+  animation: shine 1.2s ease-in-out infinite;
+}
+
+.btn:hover {
+  animation: bounceSoft 0.6s ease-in-out;
+  animation-iteration-count: 1;
+}
+
+.btn-primary {
+  animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+/* 玻璃卡片增强 */
+.glass {
+  animation: cardBreath 4s ease-in-out infinite;
+}
+
+/* 按钮 active 状态增强 */
+.btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.5) inset;
 }
 
 /* 减少动画模式 */

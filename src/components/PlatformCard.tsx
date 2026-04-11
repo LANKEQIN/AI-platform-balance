@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Platform } from '../types/platform';
 
 interface PlatformCardProps {
@@ -10,6 +10,7 @@ interface PlatformCardProps {
   onStar: (id: string) => void;
   onEdit: (platform: Platform) => void;
   onGo: (url: string) => void;
+  index: number;
 }
 
 const PlatformCard: React.FC<PlatformCardProps> = ({
@@ -20,23 +21,58 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
   onSelect,
   onStar,
   onEdit,
-  onGo
+  onGo,
+  index
 }) => {
   const isStarred = useMemo(() => platform.starred || false, [platform.starred]);
   const displayUrl = useMemo(() => platform.customUrl || platform.url, [platform.customUrl, platform.url]);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  // 磁悬浮倾斜效果
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = (y - centerY) / 10;
+    const rotateY = (centerX - x) / 10;
+    setTilt({ x: rotateX, y: rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+    setIsHovered(false);
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
 
   return (
     <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnter}
       className={`
         platform-card relative glass rounded-2xl p-6 shadow-lg transition-all duration-300 ease-out
-        hover:-translate-y-1 hover:shadow-xl hover:border-white/35
-        ${isStarred ? 'border-amber-400/50 shadow-[0_0_25px_rgba(251,191,36,0.2)]' : ''}
-        ${isSelected ? 'ring-2 ring-primary-500' : ''}
+        hover:-translate-y-3 hover:shadow-2xl hover:border-white/45
+        ${isStarred ? 'border-amber-400/60 shadow-[0_0_35px_rgba(251,191,36,0.3)]' : ''}
+        ${isSelected ? 'ring-2 ring-primary-500 ring-offset-2 ring-offset-transparent' : ''}
         ${viewMode === 'list' ? 'flex items-center gap-4' : 'flex flex-col'}
+        animate-fade-in-up-stagger
       `}
       style={{
-        contain: 'layout style paint'
-      }}
+        contain: 'layout style paint',
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${isHovered ? 1.02 : 1})`,
+        transition: 'transform 0.1s ease-out, box-shadow 0.3s ease, border-color 0.3s ease',
+        animationDelay: `${index * 0.05}s`,
+        '--card-glow-color': isStarred ? 'rgba(251, 191, 36, 0.4)' : 'rgba(20, 184, 166, 0.3)'
+      } as React.CSSProperties}
     >
       {/* 选择框 - 选择模式时显示 */}
       {isSelectMode && (
@@ -82,7 +118,11 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
         ${viewMode === 'list' ? 'mb-0 w-48 flex-shrink-0' : ''}
       `}>
         <div 
-          className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/15 to-white/5 flex items-center justify-center text-2xl shadow-sm flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-5"
+          className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/15 to-white/5 flex items-center justify-center text-2xl shadow-sm flex-shrink-0 transition-all duration-300 animate-icon-wobble"
+          style={{
+            transform: isHovered ? 'scale(1.15) rotate(5deg)' : 'scale(1) rotate(0deg)',
+            boxShadow: isHovered ? '0 0 20px rgba(20, 184, 166, 0.5)' : '0 0 0 rgba(0,0,0,0)'
+          }}
         >
           {platform.icon}
         </div>

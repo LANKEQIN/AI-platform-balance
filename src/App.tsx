@@ -297,7 +297,7 @@ function App() {
               role="list"
               aria-label="AI平台列表"
             >
-              {filteredPlatforms.map((platform) => (
+              {filteredPlatforms.map((platform, index) => (
                 <PlatformCard
                   key={platform.id}
                   platform={platform}
@@ -308,6 +308,7 @@ function App() {
                   onStar={handleStar}
                   onEdit={handleEdit}
                   onGo={handleGo}
+                  index={index}
                 />
               ))}
             </div>
