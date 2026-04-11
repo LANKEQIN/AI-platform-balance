@@ -6,7 +6,6 @@ interface PlatformCardProps {
   viewMode: 'grid' | 'list';
   isSelectMode: boolean;
   isSelected: boolean;
-  index: number;
   onSelect: (id: string) => void;
   onStar: (id: string) => void;
   onEdit: (platform: Platform) => void;
@@ -18,17 +17,13 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
   viewMode,
   isSelectMode,
   isSelected,
-  index,
   onSelect,
   onStar,
   onEdit,
   onGo
 }) => {
-  const isStarred = platform.starred || false;
-  const displayUrl = platform.customUrl || platform.url;
-
-  // 使用固定的索引来计算动画延迟，避免随机值导致的闪烁
-  const animationDelay = useMemo(() => `${index * 0.05}s`, [index]);
+  const isStarred = useMemo(() => platform.starred || false, [platform.starred]);
+  const displayUrl = useMemo(() => platform.customUrl || platform.url, [platform.customUrl, platform.url]);
 
   return (
     <div
@@ -40,15 +35,9 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
         ${viewMode === 'list' ? 'flex items-center gap-4' : 'flex flex-col'}
       `}
       style={{
-        willChange: 'transform'
+        contain: 'layout style paint'
       }}
     >
-      {/* 卡片顶部光泽 */}
-      <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/8 to-transparent rounded-t-2xl pointer-events-none" />
-      
-      {/* 卡片底部光晕 */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-1/3 bg-gradient-to-t from-primary-500/10 to-transparent rounded-b-2xl pointer-events-none blur-xl" />
-
       {/* 选择框 - 选择模式时显示 */}
       {isSelectMode && (
         <button
@@ -93,10 +82,7 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
         ${viewMode === 'list' ? 'mb-0 w-48 flex-shrink-0' : ''}
       `}>
         <div 
-          className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/15 to-white/5 flex items-center justify-center text-2xl shadow-sm flex-shrink-0 transition-all duration-300 hover:scale-110 hover:rotate-5"
-          style={{
-            boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)'
-          }}
+          className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/15 to-white/5 flex items-center justify-center text-2xl shadow-sm flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-5"
         >
           {platform.icon}
         </div>

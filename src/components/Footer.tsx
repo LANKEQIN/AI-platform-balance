@@ -1,8 +1,9 @@
 import React from 'react';
+import { STORAGE_KEYS } from '../types/platform';
 
 const Footer: React.FC = () => {
   const handleShowLanding = () => {
-    localStorage.removeItem('ai_platforms_has_visited');
+    sessionStorage.removeItem(STORAGE_KEYS.HAS_VISITED);
     window.location.reload();
   };
 

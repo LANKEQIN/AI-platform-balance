@@ -1,50 +1,59 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const VisualEffects: React.FC = () => {
-  const particlesContainerRef = useRef<HTMLDivElement>(null);
   const cursorGlowRef = useRef<HTMLDivElement>(null);
   const rippleContainerRef = useRef<HTMLDivElement>(null);
-  
-  const [particles] = useState<Array<{ 
-    id: number; 
-    left: number; 
-    top: number; 
-    size: number; 
-    duration: number; 
-    delay: number; 
+  const rafIdRef = useRef<number>(0);
+  const mousePosRef = useRef({ x: 0, y: 0 });
+  const lastMoveTimeRef = useRef(0);
+
+  // 减少粒子数量：40 → 15，降低 GPU 占用
+  const [particles] = useState<Array<{
+    id: number;
+    left: number;
+    top: number;
+    size: number;
+    duration: number;
+    delay: number;
     color: string;
   }>>(() => {
     const colors = [
-      'rgba(103, 232, 249, 0.5)',
-      'rgba(20, 184, 166, 0.5)',
-      'rgba(6, 182, 212, 0.4)',
-      'rgba(34, 211, 238, 0.4)'
+      'rgba(103, 232, 249, 0.4)',
+      'rgba(20, 184, 166, 0.4)',
+      'rgba(6, 182, 212, 0.3)',
+      'rgba(34, 211, 238, 0.3)'
     ];
-    return Array.from({ length: 40 }, (_, i) => ({
+    return Array.from({ length: 15 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
       top: Math.random() * 100,
-      size: Math.random() * 3 + 2,
-      duration: Math.random() * 20 + 25,
-      delay: Math.random() * 10,
+      size: Math.random() * 2.5 + 1.5,
+      duration: Math.random() * 25 + 30,
+      delay: Math.random() * 15,
       color: colors[Math.floor(Math.random() * colors.length)]
     }));
   });
 
-  // 鼠标追踪光效
+  // 合并鼠标事件：光标追踪 + 卡片3D效果统一用一个 rAF 循环处理
   useEffect(() => {
-    let lastMoveTime = 0;
-    const THROTTLE_MS = 32;
+    const THROTTLE_MS = 50;
 
     const handleMouseMove = (e: MouseEvent) => {
       const now = Date.now();
-      if (now - lastMoveTime < THROTTLE_MS) return;
-      lastMoveTime = now;
+      if (now - lastMoveTimeRef.current < THROTTLE_MS) return;
+      lastMoveTimeRef.current = now;
 
-      if (cursorGlowRef.current) {
-        cursorGlowRef.current.style.left = e.clientX + 'px';
-        cursorGlowRef.current.style.top = e.clientY + 'px';
-        cursorGlowRef.current.style.opacity = '1';
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+
+      // 使用 rAF 批量更新 DOM，避免布局抖动
+      if (!rafIdRef.current) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          if (cursorGlowRef.current) {
+            cursorGlowRef.current.style.transform = `translate(${mousePosRef.current.x - 150}px, ${mousePosRef.current.y - 150}px)`;
+            cursorGlowRef.current.style.opacity = '1';
+          }
+          rafIdRef.current = 0;
+        });
       }
     };
 
@@ -54,96 +63,54 @@ const VisualEffects: React.FC = () => {
       }
     };
 
-    const handleMouseEnter = () => {
-      if (cursorGlowRef.current) {
-        cursorGlowRef.current.style.opacity = '1';
-      }
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseenter', handleMouseEnter);
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('mouseenter', handleMouseEnter);
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
     };
   }, []);
 
-  // 点击涟漪效果
+  // 点击涟漪效果 - 限制同时存在的涟漪数量
   useEffect(() => {
+    const MAX_RIPPLES = 3;
+
     const handleClick = (e: MouseEvent) => {
+      if (!rippleContainerRef.current) return;
+
+      // 限制涟漪数量，防止 DOM 节点堆积
+      const existing = rippleContainerRef.current.children;
+      if (existing.length >= MAX_RIPPLES) return;
+
       const ripple = document.createElement('div');
       ripple.style.left = e.clientX + 'px';
       ripple.style.top = e.clientY + 'px';
       ripple.style.width = '20px';
       ripple.style.height = '20px';
-      ripple.style.background = 'radial-gradient(circle, rgba(20, 184, 166, 0.5) 0%, transparent 70%)';
+      ripple.style.background = 'radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%)';
       ripple.style.borderRadius = '50%';
       ripple.style.position = 'fixed';
       ripple.style.pointerEvents = 'none';
       ripple.style.transform = 'translate(-50%, -50%) scale(0)';
-      ripple.style.animation = 'rippleExpand 0.6s ease-out forwards';
+      ripple.style.animation = 'rippleExpand 0.5s ease-out forwards';
       ripple.style.zIndex = '9999';
-      ripple.style.opacity = '1';
 
-      if (rippleContainerRef.current) {
-        rippleContainerRef.current.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 600);
-      }
+      rippleContainerRef.current.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 500);
     };
 
-    document.addEventListener('click', handleClick);
+    document.addEventListener('click', handleClick, { passive: true });
     return () => document.removeEventListener('click', handleClick);
-  }, []);
-
-  // 卡片3D效果
-  useEffect(() => {
-    let lastCardMoveTime = 0;
-    const THROTTLE_MS = 32;
-
-    const handleCardHover = (e: MouseEvent) => {
-      const now = Date.now();
-      if (now - lastCardMoveTime < THROTTLE_MS) return;
-      lastCardMoveTime = now;
-
-      const card = (e.target as HTMLElement).closest('.platform-card');
-      if (card) {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateX = Math.round((y - centerY) / 20);
-        const rotateY = Math.round((centerX - x) / 20);
-
-        (card as HTMLElement).style.transform = `translateY(-8px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      }
-    };
-
-    const handleCardLeave = (e: MouseEvent) => {
-      const card = (e.target as HTMLElement).closest('.platform-card');
-      if (card) {
-        (card as HTMLElement).style.transform = '';
-      }
-    };
-
-    document.addEventListener('mousemove', handleCardHover);
-    document.addEventListener('mouseleave', handleCardLeave, true);
-
-    return () => {
-      document.removeEventListener('mousemove', handleCardHover);
-      document.removeEventListener('mouseleave', handleCardLeave, true);
-    };
   }, []);
 
   return (
     <>
       {/* 粒子容器 */}
       <div
-        ref={particlesContainerRef}
         id="particles-container"
         style={{
           position: 'fixed',
@@ -153,7 +120,8 @@ const VisualEffects: React.FC = () => {
           bottom: 0,
           pointerEvents: 'none',
           zIndex: 0,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          contain: 'strict'
         }}
       >
         {particles.map((particle) => (
@@ -169,27 +137,26 @@ const VisualEffects: React.FC = () => {
               borderRadius: '50%',
               animation: `particleFloat ${particle.duration}s linear ${particle.delay}s infinite`,
               pointerEvents: 'none',
-              boxShadow: `0 0 ${particle.size * 1.5}px ${particle.color}`
+              boxShadow: `0 0 ${particle.size}px ${particle.color}`
             }}
           />
         ))}
       </div>
 
-      {/* 鼠标追踪光效 */}
+      {/* 鼠标追踪光效 - 缩小尺寸：400px → 300px，降低渲染面积 */}
       <div
         ref={cursorGlowRef}
         style={{
           position: 'fixed',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%)',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(20, 184, 166, 0.12) 0%, transparent 70%)',
           borderRadius: '50%',
           pointerEvents: 'none',
-          transform: 'translate(-50%, -50%)',
           zIndex: 1,
           opacity: 0,
-          transition: 'opacity 0.5s ease',
-          mixBlendMode: 'screen'
+          transition: 'opacity 0.3s ease',
+          willChange: 'transform'
         }}
       />
 
@@ -208,7 +175,7 @@ const VisualEffects: React.FC = () => {
         }}
       />
 
-      {/* 背景极光效果 */}
+      {/* 背景极光效果 - 简化渐变，减少重绘 */}
       <div
         style={{
           position: 'fixed',
@@ -219,11 +186,11 @@ const VisualEffects: React.FC = () => {
           pointerEvents: 'none',
           zIndex: -1,
           background: `
-            radial-gradient(ellipse at 10% 10%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
-            radial-gradient(ellipse at 90% 90%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 80%, rgba(34, 211, 238, 0.08) 0%, transparent 40%)
+            radial-gradient(ellipse at 10% 10%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 90% 90%, rgba(20, 184, 166, 0.1) 0%, transparent 50%)
           `,
-          animation: 'auroraPulse 20s ease-in-out infinite alternate'
+          animation: 'auroraPulse 25s ease-in-out infinite alternate',
+          contain: 'strict'
         }}
       />
 
@@ -232,24 +199,24 @@ const VisualEffects: React.FC = () => {
         @keyframes particleFloat {
           0% {
             transform: translateY(0) rotate(0deg);
-            opacity: 0.3;
+            opacity: 0.2;
           }
           50% {
-            opacity: 0.8;
+            opacity: 0.6;
           }
           100% {
             transform: translateY(-120vh) rotate(360deg);
-            opacity: 0.3;
+            opacity: 0.2;
           }
         }
 
         @keyframes rippleExpand {
           0% {
             transform: translate(-50%, -50%) scale(0);
-            opacity: 1;
+            opacity: 0.8;
           }
           100% {
-            transform: translate(-50%, -50%) scale(12);
+            transform: translate(-50%, -50%) scale(10);
             opacity: 0;
           }
         }
@@ -259,7 +226,7 @@ const VisualEffects: React.FC = () => {
             filter: hue-rotate(0deg);
           }
           100% {
-            filter: hue-rotate(40deg);
+            filter: hue-rotate(30deg);
           }
         }
       `}</style>

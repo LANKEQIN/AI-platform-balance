@@ -99,7 +99,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 动态渐变背景层 */
+/* 动态渐变背景层 - 降低动画频率减少重绘 */
 body::before {
   content: '';
   position: fixed;
@@ -116,11 +116,12 @@ body::before {
     var(--bg-gradient-1) 100%
   );
   background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  animation: gradientShift 25s ease infinite;
   z-index: -2;
+  contain: strict;
 }
 
-/* 动态光晕层 */
+/* 动态光晕层 - 简化动画 */
 body::after {
   content: '';
   position: fixed;
@@ -129,22 +130,22 @@ body::after {
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(ellipse at 20% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 40% 60%, rgba(34, 211, 238, 0.1) 0%, transparent 40%);
-  animation: auroraMove 20s ease-in-out infinite alternate;
+    radial-gradient(ellipse at 20% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.12) 0%, transparent 50%);
+  animation: auroraMove 30s ease-in-out infinite alternate;
   z-index: -1;
   pointer-events: none;
+  contain: strict;
 }
 
-/* 玻璃效果组件 */
+/* 玻璃效果组件 - 降低 blur 从 20px 到 12px，大幅减少 GPU 开销 */
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
-  transition: all var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform, opacity;
+  transition: background var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1),
+              border-color var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-hover:hover {
@@ -190,8 +191,8 @@ body::after {
 
 .btn-secondary {
   background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--text-primary);
   box-shadow: var(--shadow-sm);
 }
@@ -219,8 +220,8 @@ body::after {
   height: var(--touch-target-min);
   padding: 0;
   background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   font-size: 1.2rem;
   color: var(--text-primary);
   border-radius: var(--radius-md);

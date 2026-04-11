@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { poetryDatabase, quotesDatabase, PoetryItem } from '../config/poetry';
 
 interface LandingPageProps {
@@ -7,12 +7,21 @@ interface LandingPageProps {
 
 const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   // 古诗词状态
-  const [currentPoetry, setCurrentPoetry] = useState<PoetryItem>();
-  const [poetryIndex, setPoetryIndex] = useState<number>(0);
+  const [currentPoetry, setCurrentPoetry] = useState<PoetryItem>(() => {
+    const index = Math.floor(Math.random() * poetryDatabase.length);
+    return poetryDatabase[index];
+  });
+  const [poetryIndex, setPoetryIndex] = useState<number>(() => {
+    return Math.floor(Math.random() * poetryDatabase.length);
+  });
   
-  // 名人名言状态
-  const [currentQuote, setCurrentQuote] = useState<PoetryItem>();
-  const [quoteIndex, setQuoteIndex] = useState<number>(0);
+  const [currentQuote, setCurrentQuote] = useState<PoetryItem>(() => {
+    const index = Math.floor(Math.random() * quotesDatabase.length);
+    return quotesDatabase[index];
+  });
+  const [quoteIndex, setQuoteIndex] = useState<number>(() => {
+    return Math.floor(Math.random() * quotesDatabase.length);
+  });
 
   // 获取随机古诗词
   const getRandomPoetry = useCallback((avoidIndex?: number) => {
@@ -34,18 +43,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
     setQuoteIndex(newIndex);
     setCurrentQuote(quotesDatabase[newIndex]);
-  }, []);
-
-  // 初始化随机内容
-  useEffect(() => {
-    const randomPoetryIndex = Math.floor(Math.random() * poetryDatabase.length);
-    const randomQuoteIndex = Math.floor(Math.random() * quotesDatabase.length);
-    
-    setPoetryIndex(randomPoetryIndex);
-    setCurrentPoetry(poetryDatabase[randomPoetryIndex]);
-    
-    setQuoteIndex(randomQuoteIndex);
-    setCurrentQuote(quotesDatabase[randomQuoteIndex]);
   }, []);
 
   return (

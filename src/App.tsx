@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { usePlatforms } from './hooks/usePlatforms';
 import { useToast } from './hooks/useToast';
@@ -10,6 +10,7 @@ import PlatformCard from './components/PlatformCard';
 import EmptyState from './components/EmptyState';
 import EditPlatformModal from './components/EditPlatformModal';
 import AddPlatformModal from './components/AddPlatformModal';
+import ConfirmModal from './components/ConfirmModal';
 import BatchToolbar from './components/BatchToolbar';
 import ToastContainer from './components/ToastContainer';
 import Footer from './components/Footer';
@@ -30,6 +31,21 @@ function App() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // Refs 用于优化回调依赖项
+  const platformsRef = useRef<Platform[]>(platforms);
+  const selectedIdsRef = useRef<Set<string>>(selectedIds);
+  const filteredPlatformsRef = useRef<Platform[]>([]);
+
+  // 同步 refs
+  useEffect(() => {
+    platformsRef.current = platforms;
+  }, [platforms]);
+
+  useEffect(() => {
+    selectedIdsRef.current = selectedIds;
+  }, [selectedIds]);
 
   // 检查是否已访问过应用
   useEffect(() => {
@@ -79,7 +95,7 @@ function App() {
 
   // 过滤平台
   const filteredPlatforms = useMemo(() => {
-    return platforms.filter((platform) => {
+    const result = platforms.filter((platform) => {
       // 搜索过滤
       const matchesSearch = searchKeyword === '' ||
         platform.name.toLowerCase().includes(searchKeyword.toLowerCase());
@@ -94,6 +110,8 @@ function App() {
 
       return matchesSearch && matchesCategory;
     });
+    filteredPlatformsRef.current = result;
+    return result;
   }, [platforms, searchKeyword, currentCategory]);
 
   // 切换收藏
@@ -111,16 +129,12 @@ function App() {
     setShowEditModal(true);
   }, []);
 
-  // 保存编辑
+  // 保存编辑 - 使用 updatePlatform 保持一致性
   const handleSaveEdit = useCallback((updatedPlatform: Platform) => {
-    const index = platforms.findIndex(p => p.id === updatedPlatform.id);
-    if (index !== -1) {
-      const newPlatforms = [...platforms];
-      newPlatforms[index] = updatedPlatform;
-      setPlatforms(newPlatforms);
-      showToast('平台已更新', 'success');
-    }
-  }, [platforms, setPlatforms, showToast]);
+    const { id, ...updates } = updatedPlatform;
+    updatePlatform(id, updates);
+    showToast('平台已更新', 'success');
+  }, [updatePlatform, showToast]);
 
   // 删除平台
   const handleDelete = useCallback((platformId: string) => {
@@ -134,10 +148,15 @@ function App() {
     showToast('平台已添加', 'success');
   }, [addPlatform, showToast]);
 
-  // 访问平台
+  // 访问平台 - 添加错误处理
   const handleGo = useCallback((url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }, []);
+    try {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('打开链接失败:', error);
+      showToast('无法打开链接，请检查链接格式', 'error');
+    }
+  }, [showToast]);
 
   // 切换选择
   const handleSelect = useCallback((platformId: string) => {
@@ -152,21 +171,25 @@ function App() {
     });
   }, []);
 
-  // 全选
+  // 全选 - 使用 ref 避免依赖 filteredPlatforms
   const handleSelectAll = useCallback(() => {
-    setSelectedIds(new Set(filteredPlatforms.map(p => p.id)));
-  }, [filteredPlatforms]);
+    setSelectedIds(new Set(filteredPlatformsRef.current.map(p => p.id)));
+  }, []);
 
-  // 批量打开
+  // 批量打开 - 使用 refs 避免依赖项
   const handleBatchOpen = useCallback(() => {
-    selectedIds.forEach((id: string) => {
-      const platform = platforms.find(p => p.id === id);
+    selectedIdsRef.current.forEach((id: string) => {
+      const platform = platformsRef.current.find(p => p.id === id);
       if (platform) {
         const url = platform.customUrl || platform.url;
-        window.open(url, '_blank', 'noopener,noreferrer');
+        try {
+          window.open(url, '_blank', 'noopener,noreferrer');
+        } catch (error) {
+          console.error('批量打开链接失败:', error);
+        }
       }
     });
-  }, [selectedIds, platforms]);
+  }, []);
 
   // 退出选择模式
   const handleCancelSelect = useCallback(() => {
@@ -189,25 +212,27 @@ function App() {
     showToast('配置已导出', 'success');
   }, [storage, showToast]);
 
-  // 导入配置
+  // 导入配置 - 使用返回的平台数据，避免重复读取 localStorage
   const handleImport = useCallback((content: string) => {
     const result = storage.importConfig(content);
-    if (result.success) {
-      // 重新加载平台
-      setPlatforms(storage.getPlatforms());
+    if (result.success && result.platforms) {
+      setPlatforms(result.platforms);
       showToast(result.message, 'success');
     } else {
       showToast(result.message, 'error');
     }
   }, [storage, setPlatforms, showToast]);
 
-  // 重置配置
+  // 显示重置确认弹窗
   const handleReset = useCallback(() => {
-    if (confirm('确定要重置所有配置吗？此操作不可撤销。')) {
-      const defaultPlatforms = resetToDefault();
-      setPlatforms(defaultPlatforms);
-      showToast('配置已重置', 'success');
-    }
+    setShowResetConfirm(true);
+  }, []);
+
+  // 执行重置
+  const handleConfirmReset = useCallback(() => {
+    const defaultPlatforms = resetToDefault();
+    setPlatforms(defaultPlatforms);
+    showToast('配置已重置', 'success');
   }, [resetToDefault, setPlatforms, showToast]);
 
   // 处理开始使用
@@ -272,14 +297,13 @@ function App() {
               role="list"
               aria-label="AI平台列表"
             >
-              {filteredPlatforms.map((platform, index) => (
+              {filteredPlatforms.map((platform) => (
                 <PlatformCard
                   key={platform.id}
                   platform={platform}
                   viewMode={viewMode}
                   isSelectMode={isSelectMode}
                   isSelected={selectedIds.has(platform.id)}
-                  index={index}
                   onSelect={handleSelect}
                   onStar={handleStar}
                   onEdit={handleEdit}
@@ -318,6 +342,18 @@ function App() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onAdd={handleAdd}
+      />
+
+      {/* 重置确认弹窗 */}
+      <ConfirmModal
+        isOpen={showResetConfirm}
+        onClose={() => setShowResetConfirm(false)}
+        onConfirm={handleConfirmReset}
+        title="重置配置"
+        message="确定要重置所有配置吗？此操作不可撤销。"
+        confirmText="重置"
+        cancelText="取消"
+        variant="danger"
       />
 
       {/* 页脚 */}

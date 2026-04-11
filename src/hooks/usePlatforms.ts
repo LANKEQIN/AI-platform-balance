@@ -20,9 +20,12 @@ export function usePlatforms() {
   }, [storage]);
 
   // 保存平台并更新状态
-  const saveAndUpdate = useCallback((newPlatforms: Platform[]) => {
-    storage.savePlatforms(newPlatforms);
-    setPlatforms(newPlatforms);
+  const saveAndUpdate = useCallback((newPlatforms: Platform[]): boolean => {
+    const result = storage.savePlatforms(newPlatforms);
+    if (result) {
+      setPlatforms(newPlatforms);
+    }
+    return result;
   }, [storage]);
 
   // 更新单个平台

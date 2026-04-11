@@ -25,9 +25,9 @@ export const STORAGE_KEYS = {
 export const CONFIG_VERSION = 4;
 
 // 分类配置
-export const CATEGORIES = [
+export const CATEGORIES: Array<{ id: string; name: string; icon: string }> = [
   { id: 'all', name: '全部', icon: '📋' },
   { id: '云服务商', name: '云服务商', icon: '🤖' },
   { id: 'C端平台', name: 'C端平台', icon: '💬' },
   { id: '其他', name: '其他', icon: '📦' }
-] as const;
+];
