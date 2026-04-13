@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { Platform, STORAGE_KEYS, CONFIG_VERSION } from '../types/platform';
+import { Platform, STORAGE_KEYS, CONFIG_VERSION, PlatformGroup, DEFAULT_GROUPS } from '../types/platform';
 import { DEFAULT_PLATFORMS } from '../config/platforms';
 
 function isValidPlatform(obj: any): obj is Platform {
@@ -12,6 +12,16 @@ function isValidPlatform(obj: any): obj is Platform {
     typeof obj.url === 'string' &&
     typeof obj.icon === 'string' &&
     typeof obj.enabled === 'boolean'
+  );
+}
+
+function isValidGroup(obj: any): obj is PlatformGroup {
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.icon === 'string'
   );
 }
 
@@ -269,6 +279,75 @@ export function useStorage() {
     sessionStorage.setItem(STORAGE_KEYS.HAS_VISITED, 'true');
   }, []);
 
+  // 分组相关方法
+  const getGroups = useCallback((): PlatformGroup[] => {
+    try {
+      const savedGroups = localStorage.getItem(STORAGE_KEYS.GROUPS_CONFIG);
+      if (savedGroups) {
+        const parsed = JSON.parse(savedGroups);
+        if (Array.isArray(parsed)) {
+          const validGroups = parsed.filter(isValidGroup);
+          if (validGroups.length > 0) {
+            return validGroups;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('读取分组配置失败:', error);
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_GROUPS));
+  }, []);
+
+  const saveGroups = useCallback((groups: PlatformGroup[]): boolean => {
+    try {
+      const data = JSON.stringify(groups);
+      localStorage.setItem(STORAGE_KEYS.GROUPS_CONFIG, data);
+      return true;
+    } catch (error) {
+      console.error('保存分组配置失败:', error);
+      return false;
+    }
+  }, []);
+
+  const addGroup = useCallback((group: Omit<PlatformGroup, 'id' | 'sortOrder'>): boolean => {
+    const groups = getGroups();
+    const newGroup: PlatformGroup = {
+      ...group,
+      id: 'group_' + Date.now(),
+      sortOrder: groups.length
+    };
+    groups.push(newGroup);
+    return saveGroups(groups);
+  }, [getGroups, saveGroups]);
+
+  const updateGroup = useCallback((groupId: string, updates: Partial<PlatformGroup>): boolean => {
+    const groups = getGroups();
+    const index = groups.findIndex(g => g.id === groupId);
+    if (index !== -1) {
+      groups[index] = { ...groups[index], ...updates };
+      return saveGroups(groups);
+    }
+    return false;
+  }, [getGroups, saveGroups]);
+
+  const deleteGroup = useCallback((groupId: string): boolean => {
+    if (groupId === 'default') {
+      console.error('不能删除默认分组');
+      return false;
+    }
+    const groups = getGroups();
+    const filteredGroups = groups.filter(g => g.id !== groupId);
+    
+    // 将该分组下的平台移到默认分组
+    const platforms = getPlatforms();
+    const updatedPlatforms = platforms.map(p => 
+      p.groupId === groupId ? { ...p, groupId: 'default' } : p
+    );
+    savePlatforms(updatedPlatforms);
+    
+    return saveGroups(filteredGroups);
+  }, [getGroups, saveGroups, getPlatforms, savePlatforms]);
+
   return {
     getPlatforms,
     savePlatforms,
@@ -286,6 +365,12 @@ export function useStorage() {
     setHasVisited,
     getEffectsMode,
     saveEffectsMode,
-    flushSave
+    flushSave,
+    // 分组相关
+    getGroups,
+    saveGroups,
+    addGroup,
+    updateGroup,
+    deleteGroup
   };
 }

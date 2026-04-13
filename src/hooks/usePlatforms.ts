@@ -28,6 +28,17 @@ export function usePlatforms() {
     return result;
   }, [storage]);
 
+  // 支持函数式更新的 setPlatforms
+  const setPlatformsWithUpdater = useCallback((update: Platform[] | ((prev: Platform[]) => Platform[])): void => {
+    let newPlatforms: Platform[];
+    if (typeof update === 'function') {
+      newPlatforms = update(platformsRef.current);
+    } else {
+      newPlatforms = update;
+    }
+    saveAndUpdate(newPlatforms);
+  }, [saveAndUpdate]);
+
   // 更新单个平台
   const updatePlatform = useCallback((platformId: string, updates: Partial<Platform>) => {
     const currentPlatforms = platformsRef.current;
@@ -64,7 +75,7 @@ export function usePlatforms() {
   return {
     platforms,
     loading,
-    setPlatforms: saveAndUpdate,
+    setPlatforms: setPlatformsWithUpdater,
     updatePlatform,
     addPlatform,
     deletePlatform,

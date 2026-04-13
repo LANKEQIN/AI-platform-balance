@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
-import { Platform } from '../types/platform';
+import { Platform, PlatformGroup } from '../types/platform';
 import { DEFAULT_PLATFORMS } from '../config/platforms';
 
 interface EditPlatformModalProps {
   isOpen: boolean;
   onClose: () => void;
   platform: Platform | null;
+  groups: PlatformGroup[];
   onSave: (platform: Platform) => void;
   onDelete?: (id: string) => void;
 }
@@ -15,12 +16,14 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
   isOpen,
   onClose,
   platform,
+  groups,
   onSave,
   onDelete
 }) => {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('云服务商');
+  const [groupId, setGroupId] = useState('default');
   const [starred, setStarred] = useState(false);
   const [note, setNote] = useState('');
   const [showReset, setShowReset] = useState(false);
@@ -34,6 +37,7 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
       setName(platform.name);
       setUrl(platform.customUrl || platform.url);
       setCategory(platform.category);
+      setGroupId(platform.groupId || 'default');
       setStarred(platform.starred || false);
       setNote(platform.note || '');
 
@@ -64,6 +68,7 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
       ...platform,
       name,
       category,
+      groupId,
       customUrl,
       starred,
       note: note || undefined
@@ -170,6 +175,25 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
             {categories.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 分组 */}
+        <div>
+          <label htmlFor="editGroup" className="block mb-1 text-sm font-semibold text-white">
+            分组
+          </label>
+          <select
+            id="editGroup"
+            className="form-select"
+            value={groupId}
+            onChange={(e) => setGroupId(e.target.value)}
+          >
+            {groups.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.icon} {group.name}
               </option>
             ))}
           </select>

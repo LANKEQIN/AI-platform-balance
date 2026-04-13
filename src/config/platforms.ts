@@ -8,7 +8,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://console.volcengine.com/finance/bill/detail',
     icon: '🌋',
-    enabled: true
+    enabled: true,
+    sortOrder: 0,
+    groupId: 'default'
   },
   {
     id: 'promptpilot',
@@ -16,7 +18,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '其他',
     url: 'https://promptpilot.volcengine.com/',
     icon: '✈️',
-    enabled: true
+    enabled: true,
+    sortOrder: 1,
+    groupId: 'default'
   },
   {
     id: 'deepseek',
@@ -24,7 +28,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://platform.deepseek.com/usage',
     icon: '🔍',
-    enabled: true
+    enabled: true,
+    sortOrder: 2,
+    groupId: 'default'
   },
   {
     id: 'deepseek-chat',
@@ -32,7 +38,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: 'C端平台',
     url: 'https://chat.deepseek.com/',
     icon: '💬',
-    enabled: true
+    enabled: true,
+    sortOrder: 3,
+    groupId: 'default'
   },
   {
     id: 'minimax-agent',
@@ -40,7 +48,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: 'C端平台',
     url: 'https://agent.minimaxi.com/',
     icon: '🤖',
-    enabled: true
+    enabled: true,
+    sortOrder: 4,
+    groupId: 'default'
   },
   {
     id: 'zhipu-glm',
@@ -48,7 +58,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: 'C端平台',
     url: 'https://chatglm.cn/main/alltoolsdetail?lang=zh',
     icon: '🧬',
-    enabled: true
+    enabled: true,
+    sortOrder: 5,
+    groupId: 'default'
   },
   {
     id: 'moonshot',
@@ -56,7 +68,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://platform.moonshot.cn/console/account',
     icon: '🌙',
-    enabled: true
+    enabled: true,
+    sortOrder: 6,
+    groupId: 'default'
   },
   {
     id: 'zhipu',
@@ -64,7 +78,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://www.bigmodel.cn/finance-center/finance/overview',
     icon: '🧠',
-    enabled: true
+    enabled: true,
+    sortOrder: 7,
+    groupId: 'default'
   },
   {
     id: 'aliyun-bailian',
@@ -72,7 +88,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://billing-cost.console.aliyun.com/home',
     icon: '☁️',
-    enabled: true
+    enabled: true,
+    sortOrder: 8,
+    groupId: 'default'
   },
   {
     id: 'modelscope',
@@ -80,7 +98,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://modelscope.cn/my/overview',
     icon: '🤝',
-    enabled: true
+    enabled: true,
+    sortOrder: 9,
+    groupId: 'default'
   },
   {
     id: 'minimax',
@@ -88,7 +108,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://platform.minimaxi.com/user-center/payment/balance',
     icon: '⚡',
-    enabled: true
+    enabled: true,
+    sortOrder: 10,
+    groupId: 'default'
   },
   {
     id: 'siliconflow',
@@ -96,7 +118,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://cloud.siliconflow.cn/me/expensebill',
     icon: '💎',
-    enabled: true
+    enabled: true,
+    sortOrder: 11,
+    groupId: 'default'
   },
   {
     id: 'siliconflow-global',
@@ -104,7 +128,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://cloud.siliconflow.com/models',
     icon: '💎',
-    enabled: true
+    enabled: true,
+    sortOrder: 12,
+    groupId: 'default'
   },
   {
     id: 'openrouter',
@@ -112,7 +138,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://openrouter.ai/',
     icon: '🛤️',
-    enabled: true
+    enabled: true,
+    sortOrder: 13,
+    groupId: 'default'
   },
   {
     id: 'aihubmix',
@@ -120,7 +148,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://aihubmix.com/models',
     icon: '🧩',
-    enabled: true
+    enabled: true,
+    sortOrder: 14,
+    groupId: 'default'
   },
   {
     id: 'zhipu-open',
@@ -128,7 +158,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://open.bigmodel.cn/pricing',
     icon: '🧠',
-    enabled: true
+    enabled: true,
+    sortOrder: 15,
+    groupId: 'default'
   },
   {
     id: 'zhipu-global',
@@ -136,7 +168,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '云服务商',
     url: 'https://z.ai/manage-apikey/apikey-list',
     icon: '🌐',
-    enabled: true
+    enabled: true,
+    sortOrder: 16,
+    groupId: 'default'
   },
   {
     id: 'aigcpanel',
@@ -144,7 +178,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '其他',
     url: 'https://aigcpanel.com/zh',
     icon: '🎭',
-    enabled: true
+    enabled: true,
+    sortOrder: 17,
+    groupId: 'default'
   },
   {
     id: 'grok',
@@ -152,7 +188,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: 'C端平台',
     url: 'https://grok.com/',
     icon: '🤖',
-    enabled: true
+    enabled: true,
+    sortOrder: 18,
+    groupId: 'default'
   },
   {
     id: 'chatgpt',
@@ -160,7 +198,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: 'C端平台',
     url: 'https://chatgpt.com/',
     icon: '💬',
-    enabled: true
+    enabled: true,
+    sortOrder: 19,
+    groupId: 'default'
   },
   {
     id: 'canirun',
@@ -168,7 +208,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: 'C端平台',
     url: 'https://www.canirun.ai/',
     icon: '🚀',
-    enabled: true
+    enabled: true,
+    sortOrder: 20,
+    groupId: 'default'
   },
   {
     id: 'manus',
@@ -176,7 +218,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: 'C端平台',
     url: 'https://manus.im/app',
     icon: '✋',
-    enabled: true
+    enabled: true,
+    sortOrder: 21,
+    groupId: 'default'
   },
   {
     id: 'ai-bot',
@@ -184,7 +228,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '其他',
     url: 'https://ai-bot.cn',
     icon: '🧰',
-    enabled: true
+    enabled: true,
+    sortOrder: 22,
+    groupId: 'default'
   },
   {
     id: 'aibase-daily',
@@ -192,7 +238,9 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: '其他',
     url: 'https://news.aibase.com/zh/daily',
     icon: '📰',
-    enabled: true
+    enabled: true,
+    sortOrder: 23,
+    groupId: 'default'
   },
   {
     id: 'huggingface',
@@ -200,6 +248,8 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     category: 'C端平台',
     url: 'https://huggingface.co',
     icon: '🤗',
-    enabled: true
+    enabled: true,
+    sortOrder: 24,
+    groupId: 'default'
   }
 ];
