@@ -53,7 +53,7 @@ export function usePlatforms() {
     const currentPlatforms = platformsRef.current;
     const newPlatform: Platform = {
       ...platform,
-      id: 'custom_' + Date.now(),
+      id: 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
       enabled: true
     };
     saveAndUpdate([...currentPlatforms, newPlatform]);
