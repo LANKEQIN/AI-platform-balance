@@ -201,5 +201,13 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     url: 'https://huggingface.co',
     icon: '🤗',
     enabled: true
+  },
+  {
+    id: 'kimi-code',
+    name: 'Kimi Code',
+    category: '云服务商',
+    url: 'https://www.kimi.com/code',
+    icon: '🚀',
+    enabled: true
   }
 ];

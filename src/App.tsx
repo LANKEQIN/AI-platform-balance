@@ -15,7 +15,6 @@ import BatchToolbar from './components/BatchToolbar';
 import ToastContainer from './components/ToastContainer';
 import Footer from './components/Footer';
 import LandingPage from './components/LandingPage';
-import VisualEffects from './components/VisualEffects';
 
 function App() {
   // Hooks
