@@ -19,7 +19,12 @@ import BatchToolbar from './components/BatchToolbar';
 import ToastContainer from './components/ToastContainer';
 import Footer from './components/Footer';
 import LandingPage from './components/LandingPage';
-import VisualEffects from './components/VisualEffects';
+
+const getGridClassName = (viewMode: 'grid' | 'list') => {
+  return viewMode === 'grid'
+    ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+    : 'grid-cols-1';
+};
 
 function App() {
   // Hooks
@@ -143,7 +148,7 @@ function App() {
 
   // 过滤平台
   const filteredPlatforms = useMemo(() => {
-    const result = platforms.filter((platform) => {
+    return platforms.filter((platform) => {
       // 搜索过滤
       const matchesSearch = searchKeyword === '' ||
         platform.name.toLowerCase().includes(searchKeyword.toLowerCase());
@@ -158,9 +163,12 @@ function App() {
 
       return matchesSearch && matchesCategory;
     });
-    filteredPlatformsRef.current = result;
-    return result;
   }, [platforms, searchKeyword, currentCategory]);
+
+  // 同步 filteredPlatforms ref
+  useEffect(() => {
+    filteredPlatformsRef.current = filteredPlatforms;
+  }, [filteredPlatforms]);
 
   // 分组管理回调
   const handleAddGroup = useCallback((group: Omit<PlatformGroup, 'id' | 'sortOrder'>) => {
@@ -389,7 +397,7 @@ function App() {
           ) : filteredPlatforms.length === 0 ? (
             <EmptyState onAddFirst={() => setShowAddModal(true)} />
           ) : isDragEnabled ? (
-            /* 拖拽模式下显示所有平台并支持排序 */
+            /* 拖拽模式下按分组显示但忽略折叠状态 */
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -400,33 +408,60 @@ function App() {
                 items={filteredPlatforms.map(p => p.id)}
                 strategy={rectSortingStrategy}
               >
-                <div
-                  className={`grid gap-6 ${
-                    viewMode === 'grid'
-                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                      : 'grid-cols-1'
-                  }`}
-                  style={{
-                    minHeight: '200px'
-                  }}
-                  role="list"
-                  aria-label="AI平台列表（拖拽排序模式）"
-                >
-                  {filteredPlatforms.map((platform, index) => (
-                    <SortablePlatformCard
-                      key={platform.id}
-                      platform={platform}
-                      viewMode={viewMode}
-                      isSelectMode={isSelectMode}
-                      isSelected={selectedIds.has(platform.id)}
-                      onSelect={handleSelect}
-                      onStar={handleStar}
-                      onEdit={handleEdit}
-                      onGo={handleGo}
-                      index={index}
-                      isDragEnabled={isDragEnabled}
-                    />
-                  ))}
+                <div className="space-y-8">
+                  {groups
+                    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+                    .map((group) => {
+                      // 获取该分组下经过过滤的平台
+                      const groupPlatforms = filteredPlatforms.filter(p => (p.groupId || 'default') === group.id);
+                      
+                      if (groupPlatforms.length === 0) {
+                        return null;
+                      }
+
+                      return (
+                        <div key={group.id} className="space-y-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              disabled
+                              className="flex items-center gap-2 text-white/90 cursor-move"
+                              title="拖拽排序模式：忽略折叠状态"
+                            >
+                              <span className="text-2xl">{group.icon}</span>
+                              <h2 className="text-xl font-bold">{group.name}</h2>
+                              <span className="text-white/50 text-sm">({groupPlatforms.length})</span>
+                              <span className="text-primary-400 text-sm">↕️</span>
+                            </button>
+                          </div>
+                          <div
+                            className={`grid gap-6 ${getGridClassName(viewMode)}`}
+                            style={{
+                              minHeight: '100px'
+                            }}
+                            role="list"
+                            aria-label={`${group.name}分组的AI平台（拖拽排序模式）`}
+                          >
+                            {groupPlatforms
+                              .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+                              .map((platform, index) => (
+                                <SortablePlatformCard
+                                  key={platform.id}
+                                  platform={platform}
+                                  viewMode={viewMode}
+                                  isSelectMode={isSelectMode}
+                                  isSelected={selectedIds.has(platform.id)}
+                                  onSelect={handleSelect}
+                                  onStar={handleStar}
+                                  onEdit={handleEdit}
+                                  onGo={handleGo}
+                                  index={index}
+                                  isDragEnabled={isDragEnabled}
+                                />
+                              ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </SortableContext>
               <DragOverlay>
@@ -508,11 +543,7 @@ function App() {
                       </div>
                       {!group.collapsed && (
                         <div
-                          className={`grid gap-6 ${
-                            viewMode === 'grid'
-                              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                              : 'grid-cols-1'
-                          }`}
+                          className={`grid gap-6 ${getGridClassName(viewMode)}`}
                           style={{
                             minHeight: '100px'
                           }}
