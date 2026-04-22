@@ -11,6 +11,9 @@ interface HeaderProps {
   onExport: () => void;
   onImport: (content: string) => void;
   onReset: () => void;
+  isDragEnabled: boolean;
+  onToggleDrag: () => void;
+  onOpenGroupManager: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -23,7 +26,10 @@ const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
   onExport,
   onImport,
-  onReset
+  onReset,
+  isDragEnabled,
+  onToggleDrag,
+  onOpenGroupManager
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -92,6 +98,22 @@ const Header: React.FC<HeaderProps> = ({
             </button>
           )}
         </div>
+
+        <button
+          className={`btn ${isDragEnabled ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={onToggleDrag}
+          aria-label={isDragEnabled ? '退出拖拽排序' : '进入拖拽排序'}
+        >
+          {isDragEnabled ? '✋ 拖拽中' : '↔️ 排序'}
+        </button>
+
+        <button
+          className="btn btn-secondary"
+          onClick={onOpenGroupManager}
+          aria-label="分组管理"
+        >
+          📦 分组
+        </button>
 
         <button
           className="btn btn-secondary"

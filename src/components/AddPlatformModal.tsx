@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
+import { PlatformGroup } from '../types/platform';
 
 interface AddPlatformModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (platform: { name: string; url: string; category: string; icon: string; note?: string }) => void;
+  groups: PlatformGroup[];
+  onAdd: (platform: { name: string; url: string; category: string; icon: string; groupId?: string; note?: string }) => void;
 }
 
-const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, onAdd }) => {
+const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, groups, onAdd }) => {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('云服务商');
+  const [groupId, setGroupId] = useState('default');
   const [note, setNote] = useState('');
 
   // 有效的分类选项
@@ -22,6 +25,7 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, on
       setName('');
       setUrl('');
       setCategory('云服务商');
+      setGroupId('default');
       setNote('');
     }
   }, [isOpen]);
@@ -35,6 +39,7 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, on
       name: name.trim(),
       url: url.trim(),
       category,
+      groupId,
       icon: '🔗', // 默认图标
       note: note.trim() || undefined
     });
@@ -108,6 +113,25 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, on
             {categories.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 分组 */}
+        <div>
+          <label htmlFor="addGroup" className="block mb-1 text-sm font-semibold text-white">
+            分组
+          </label>
+          <select
+            id="addGroup"
+            className="form-select"
+            value={groupId}
+            onChange={(e) => setGroupId(e.target.value)}
+          >
+            {groups.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.icon} {group.name}
               </option>
             ))}
           </select>

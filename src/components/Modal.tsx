@@ -6,9 +6,10 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  width?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, footer }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, footer, width }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // 处理ESC键关闭
@@ -60,7 +61,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, footer 
       {/* 弹窗内容 */}
       <div
         ref={modalRef}
-        className="relative glass backdrop-blur-2xl rounded-2xl w-[90%] max-w-[480px] shadow-xl shadow-glow border border-white/20 animate-modal-slide-in overflow-hidden max-h-[90vh] overflow-y-auto"
+        className={`relative glass backdrop-blur-2xl rounded-2xl w-[90%] ${width || 'max-w-[480px]'} shadow-xl shadow-glow border border-white/20 animate-modal-slide-in overflow-hidden max-h-[90vh] overflow-y-auto`}
       >
         {/* 顶部光泽 */}
         <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/8 to-transparent pointer-events-none" />
