@@ -1,48 +1,39 @@
 import React, { useState, useCallback } from 'react';
-import { poetryDatabase, quotesDatabase, PoetryItem } from '../config/poetry';
+import { poetryDatabase, quotesDatabase } from '../config/poetry';
 
 interface LandingPageProps {
   onStart: () => void;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
-  // 古诗词状态
-  const [currentPoetry, setCurrentPoetry] = useState<PoetryItem>(() => {
-    const index = Math.floor(Math.random() * poetryDatabase.length);
-    return poetryDatabase[index];
-  });
-  const [poetryIndex, setPoetryIndex] = useState<number>(() => {
-    return Math.floor(Math.random() * poetryDatabase.length);
-  });
-  
-  const [currentQuote, setCurrentQuote] = useState<PoetryItem>(() => {
-    const index = Math.floor(Math.random() * quotesDatabase.length);
-    return quotesDatabase[index];
-  });
-  const [quoteIndex, setQuoteIndex] = useState<number>(() => {
-    return Math.floor(Math.random() * quotesDatabase.length);
-  });
+  // 只维护索引作为唯一数据源，内容从索引派生，避免状态不同步
+  const [poetryIndex, setPoetryIndex] = useState<number>(() =>
+    Math.floor(Math.random() * poetryDatabase.length)
+  );
+  const [quoteIndex, setQuoteIndex] = useState<number>(() =>
+    Math.floor(Math.random() * quotesDatabase.length)
+  );
 
-  // 获取随机古诗词
+  // 从索引派生当前内容，保证 index 与内容始终一致
+  const currentPoetry = poetryDatabase[poetryIndex];
+  const currentQuote = quotesDatabase[quoteIndex];
+
+  // 随机切换古诗词（避开当前索引）
   const getRandomPoetry = useCallback((avoidIndex?: number) => {
     let newIndex;
     do {
       newIndex = Math.floor(Math.random() * poetryDatabase.length);
     } while (poetryDatabase.length > 1 && newIndex === avoidIndex);
-
     setPoetryIndex(newIndex);
-    setCurrentPoetry(poetryDatabase[newIndex]);
   }, []);
 
-  // 获取随机名人名言
+  // 随机切换名人名言（避开当前索引）
   const getRandomQuote = useCallback((avoidIndex?: number) => {
     let newIndex;
     do {
       newIndex = Math.floor(Math.random() * quotesDatabase.length);
     } while (quotesDatabase.length > 1 && newIndex === avoidIndex);
-
     setQuoteIndex(newIndex);
-    setCurrentQuote(quotesDatabase[newIndex]);
   }, []);
 
   return (
