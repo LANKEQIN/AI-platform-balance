@@ -99,10 +99,14 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* 性能优化 */
-  backface-visibility: hidden;
-  perspective: 1000px;
 }
+
+/*
+ * 注意：不要在 body 上设置 perspective 或 backface-visibility
+ * perspective: 1000px 会强制为所有子元素创建 3D 渲染上下文
+ * 导致滚动时浏览器需要不断重计算，造成严重卡顿
+ * 如需硬件加速，仅在具体元素上使用 transform: translateZ(0)
+ */
 
 /* 防止闪烁的优化 */
 img, video, iframe, canvas, svg {
@@ -474,4 +478,247 @@ body::after {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ==================== 极致省电模式 ==================== */
+/**
+ * 极致省电模式通过 data-power-save="true" 属性激活
+ * 核心优化策略：
+ * 1. 禁用所有 CSS 动画和过渡（减少 GPU/CPU 开销）
+ * 2. 移除 backdrop-filter 模糊（减少 composite 开销）
+ * 3. 替换渐变为纯色（减少 paint 开销）
+ * 4. 简化阴影为最小或无（减少 paint 开销）
+ * 5. 强制硬件加速但禁用 transform 动画
+ * 6. 简化卡片和按钮样式
+ */
+[data-power-save="true"] *,
+[data-power-save="true"] *::before,
+[data-power-save="true"] *::after {
+  /* 彻底禁用动画 */
+  animation: none !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  /* 彻底禁用过渡 */
+  transition: none !important;
+  transition-duration: 0.01ms !important;
+}
+
+[data-power-save="true"] {
+  /* 禁用滚动行为动画 */
+  scroll-behavior: auto !important;
+}
+
+/* 禁用背景固定层的复杂效果 */
+[data-power-save="true"] body::before {
+  background: var(--bg-gradient-2) !important;
+  background-size: 100% 100% !important;
+}
+
+[data-power-save="true"] body::after {
+  display: none !important;
+}
+
+/* 禁用玻璃效果：移除 backdrop-filter */
+[data-power-save="true"] .glass,
+[data-power-save="true"] header.glass,
+[data-power-save="true"] .btn-secondary,
+[data-power-save="true"] .btn-icon {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 简化头部阴影 */
+[data-power-save="true"] header {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 简化按钮样式 */
+[data-power-save="true"] .btn {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+
+[data-power-save="true"] .btn::before {
+  display: none !important;
+}
+
+[data-power-save="true"] .btn:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+[data-power-save="true"] .btn:active {
+  transform: scale(0.97) !important;
+  box-shadow: none !important;
+}
+
+[data-power-save="true"] .btn-primary {
+  background: #0d9488 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-power-save="true"] .btn-primary:hover {
+  background: #0f766e !important;
+  box-shadow: none !important;
+}
+
+/* 简化卡片样式 */
+[data-power-save="true"] .platform-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-power-save="true"] .platform-card:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* 简化表单输入框 */
+[data-power-save="true"] .form-input,
+[data-power-save="true"] .form-select {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: none !important;
+}
+
+[data-power-save="true"] .form-input:focus,
+[data-power-save="true"] .form-select:focus {
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.5) !important;
+}
+
+/* 禁用模态框动画 */
+[data-power-save="true"] .modal-overlay,
+[data-power-save="true"] .modal-content {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* 简化下拉菜单 */
+[data-power-save="true"] [role="menu"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 禁用图标旋转和浮动效果 */
+[data-power-save="true"] .theme-icon {
+  transition: none !important;
+}
+
+[data-power-save="true"] .theme-icon:hover {
+  transform: none !important;
+}
+
+/* 拖拽覆盖层简化 */
+[data-power-save="true"] [data-drag-overlay="true"] {
+  opacity: 1 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Toast 通知简化 */
+[data-power-save="true"] .toast-enter {
+  animation: none !important;
+}
+
+/* 性能优化：强制 will-change 为 auto，避免过度内存占用 */
+[data-power-save="true"] .gpu-accelerated {
+  will-change: auto !important;
+  transform: none !important;
+}
+
+/* 列表项简化 */
+[data-power-save="true"] [role="listitem"] {
+  transition: none !important;
+}
+
+/* 列表项优化：使用 content-visibility 避免视口外渲染 */
+[data-power-save="true"] .platform-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
+}
+
+/* 简化网格容器，避免复杂的布局计算 */
+[data-power-save="true"] main .grid {
+  contain: layout style paint;
+}
+
+/* 禁用固定伪元素背景，减少滚动时的合成层压力 */
+[data-power-save="true"] body::before,
+[data-power-save="true"] body::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* 省电模式下的 body 背景使用纯色，避免渐变重绘 */
+[data-power-save="true"] body {
+  background: #1a2e2c !important;
+}
+
+/* ==================== 省电模式增强视觉反馈 ==================== */
+/* 省电模式顶部横幅 */
+.power-save-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  color: white;
+  text-align: center;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 9999;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+  display: none;
+}
+
+[data-power-save="true"] .power-save-banner {
+  display: block;
+}
+
+/* 省电模式下的 header 调整位置 */
+[data-power-save="true"] header {
+  margin-top: 32px;
+}
+
+/* 省电模式下更明显的卡片样式 */
+[data-power-save="true"] .platform-card {
+  background: #243634 !important;
+  border: 1px solid #3d5350 !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+}
+
+/* 省电模式下简化按钮 */
+[data-power-save="true"] .btn {
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+}
+
+/* 省电模式下禁用所有阴影 */
+[data-power-save="true"] * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* 省电模式下简化图标 */
+[data-power-save="true"] .platform-card .w-12.h-12 {
+  background: #3d5350 !important;
+  border-radius: 8px !important;
+}
+
+/* 省电模式下移除所有渐变（横幅除外） */
+[data-power-save="true"] .bg-gradient-to-br:not(.power-save-banner),
+[data-power-save="true"] .bg-gradient-to-r:not(.power-save-banner),
+[data-power-save="true"] [style*="gradient"]:not(.power-save-banner) {
+  background: #243634 !important;
 }

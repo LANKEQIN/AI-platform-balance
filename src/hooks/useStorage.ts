@@ -137,6 +137,22 @@ export function useStorage() {
     localStorage.setItem(STORAGE_KEYS.EFFECTS_MODE, mode);
   }, []);
 
+  /**
+   * 获取省电模式状态
+   * 极致省电模式下禁用所有动画、模糊、阴影和渐变效果
+   */
+  const getPowerSave = useCallback((): boolean => {
+    const value = localStorage.getItem(STORAGE_KEYS.POWER_SAVE);
+    return value === 'true';
+  }, []);
+
+  /**
+   * 保存省电模式状态
+   */
+  const savePowerSave = useCallback((enabled: boolean): void => {
+    localStorage.setItem(STORAGE_KEYS.POWER_SAVE, String(enabled));
+  }, []);
+
   const getHasVisited = useCallback((): boolean => {
     return sessionStorage.getItem(STORAGE_KEYS.HAS_VISITED) === 'true';
   }, []);
@@ -396,6 +412,8 @@ export function useStorage() {
     setHasVisited,
     getEffectsMode,
     saveEffectsMode,
+    getPowerSave,
+    savePowerSave,
     // 分组相关
     getGroups,
     saveGroups,

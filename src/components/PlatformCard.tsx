@@ -1,4 +1,4 @@
-import React, { useMemo, useState, memo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { Platform } from '../types/platform';
 
 interface PlatformCardProps {
@@ -13,6 +13,10 @@ interface PlatformCardProps {
   index: number;
 }
 
+/**
+ * 平台卡片组件
+ * 已针对省电模式优化：移除 hover state 追踪，减少重渲染
+ */
 const PlatformCard: React.FC<PlatformCardProps> = ({
   platform,
   viewMode,
@@ -22,33 +26,19 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
   onStar,
   onEdit,
   onGo,
-  index
+  index: _index
 }) => {
   const isStarred = useMemo(() => platform.starred || false, [platform.starred]);
   const displayUrl = useMemo(() => platform.customUrl || platform.url, [platform.customUrl, platform.url]);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
 
   return (
     <div
-      onMouseLeave={handleMouseLeave}
-      onMouseEnter={handleMouseEnter}
       className={`
         platform-card relative glass rounded-2xl p-6 shadow-lg
         ${isStarred ? 'border-amber-400/60' : ''}
         ${isSelected ? 'ring-2 ring-primary-500 ring-offset-2 ring-offset-transparent' : ''}
         ${viewMode === 'list' ? 'flex items-center gap-4' : 'flex flex-col'}
       `}
-      style={{
-        '--card-glow-color': isStarred ? 'rgba(251, 191, 36, 0.4)' : 'rgba(20, 184, 166, 0.3)'
-      } as React.CSSProperties}
     >
       {/* 选择框 - 选择模式时显示 */}
       {isSelectMode && (
@@ -78,11 +68,8 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
         `}
         aria-label={isStarred ? '取消收藏' : '收藏平台'}
       >
-        <span 
-          className={`text-xl filter drop-shadow-sm ${isStarred ? 'opacity-90' : ''}`}
-          style={{
-            transform: isStarred ? 'scale(1.2)' : 'scale(1)'
-          }}
+        <span
+          className={`text-xl ${isStarred ? 'opacity-90' : ''}`}
         >
           {isStarred ? '⭐' : '☆'}
         </span>

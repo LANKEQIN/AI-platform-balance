@@ -14,6 +14,8 @@ interface HeaderProps {
   isDragEnabled: boolean;
   onToggleDrag: () => void;
   onOpenGroupManager: () => void;
+  isPowerSave: boolean;
+  onTogglePowerSave: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -29,7 +31,9 @@ const Header: React.FC<HeaderProps> = ({
   onReset,
   isDragEnabled,
   onToggleDrag,
-  onOpenGroupManager
+  onOpenGroupManager,
+  isPowerSave,
+  onTogglePowerSave
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -177,6 +181,18 @@ const Header: React.FC<HeaderProps> = ({
             </div>
           )}
         </div>
+
+        {/* 极致省电模式切换 */}
+        <button
+          className={`btn btn-icon ${isPowerSave ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none scale-110' : ''}`}
+          onClick={onTogglePowerSave}
+          aria-label={isPowerSave ? '关闭极致省电模式' : '开启极致省电模式'}
+          title={isPowerSave ? '已开启极致省电模式 - 点击关闭' : '开启极致省电模式（禁用动画/模糊/阴影，提升流畅度）'}
+        >
+          <span className="leading-none">
+            {isPowerSave ? '⚡' : '🔌'}
+          </span>
+        </button>
 
         <button
           className="btn btn-icon"

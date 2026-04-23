@@ -5,6 +5,7 @@ import { useTheme } from './hooks/useTheme';
 import { usePlatforms } from './hooks/usePlatforms';
 import { useToast } from './hooks/useToast';
 import { useStorage } from './hooks/useStorage';
+import { usePowerSave } from './hooks/usePowerSave';
 import { Platform, PlatformGroup } from './types/platform';
 import Header from './components/Header';
 import Toolbar from './components/Toolbar';
@@ -32,6 +33,7 @@ function App() {
   const { platforms, loading, updatePlatform, addPlatform, deletePlatform, setPlatforms, resetToDefault } = usePlatforms();
   const { toasts, showToast, removeToast } = useToast();
   const storage = useStorage();
+  const { isPowerSave, togglePowerSave } = usePowerSave();
 
   // 状态
   const [showLanding, setShowLanding] = useState(true);
@@ -342,6 +344,11 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* 省电模式顶部横幅 */}
+      <div className="power-save-banner">
+        🔋 极致省电模式已启用 - 性能优先
+      </div>
+
       {/* 特效组件 - 暂时禁用以测试性能 */}
       {/* <VisualEffects /> */}
 
@@ -368,6 +375,11 @@ function App() {
         onReset={handleReset}
         isDragEnabled={isDragEnabled}
         onToggleDrag={() => {
+          // 省电模式下禁止进入拖拽模式
+          if (isPowerSave) {
+            showToast('省电模式下无法使用拖拽排序', 'warning');
+            return;
+          }
           setIsDragEnabled(!isDragEnabled);
           // 进入拖拽模式时退出选择模式
           if (!isDragEnabled) {
@@ -376,6 +388,8 @@ function App() {
           }
         }}
         onOpenGroupManager={() => setShowGroupManager(true)}
+        isPowerSave={isPowerSave}
+        onTogglePowerSave={togglePowerSave}
       />
 
       {/* 工具栏 */}
@@ -396,7 +410,7 @@ function App() {
             </div>
           ) : filteredPlatforms.length === 0 ? (
             <EmptyState onAddFirst={() => setShowAddModal(true)} />
-          ) : isDragEnabled ? (
+          ) : (isDragEnabled && !isPowerSave) ? (
             /* 拖拽模式下按分组显示但忽略折叠状态 */
             <DndContext
               sensors={sensors}
@@ -456,6 +470,7 @@ function App() {
                                   onGo={handleGo}
                                   index={index}
                                   isDragEnabled={isDragEnabled}
+                                  isPowerSave={isPowerSave}
                                 />
                               ))}
                           </div>

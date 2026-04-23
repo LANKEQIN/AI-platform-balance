@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import PlatformCard from './PlatformCard';
@@ -15,8 +15,34 @@ interface SortablePlatformCardProps {
   onGo: (url: string) => void;
   index: number;
   isDragEnabled?: boolean;
+  isPowerSave?: boolean;
 }
 
+/**
+ * 纯展示卡片（省电模式使用）
+ * 不注册任何拖拽事件，避免 dnd-kit 的性能开销
+ */
+const StaticCard: React.FC<Omit<SortablePlatformCardProps, 'isDragEnabled' | 'isPowerSave'>> = ({
+  platform, viewMode, isSelectMode, isSelected, onSelect, onStar, onEdit, onGo, index
+}) => (
+  <PlatformCard
+    platform={platform}
+    viewMode={viewMode}
+    isSelectMode={isSelectMode}
+    isSelected={isSelected}
+    onSelect={onSelect}
+    onStar={onStar}
+    onEdit={onEdit}
+    onGo={onGo}
+    index={index}
+  />
+);
+
+/**
+ * 可拖拽平台卡片包装组件
+ * 省电模式下直接渲染纯展示卡片，不注册拖拽逻辑
+ * 正常模式下使用 dnd-kit 实现拖拽排序
+ */
 const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
   platform,
   viewMode,
@@ -27,19 +53,33 @@ const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
   onEdit,
   onGo,
   index,
-  isDragEnabled = true
+  isDragEnabled = true,
+  isPowerSave = false
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({
-    id: platform.id,
-    disabled: !isDragEnabled || isSelectMode
-  });
+  // 省电模式下不调用 useSortable，避免注册拖拽事件监听器和状态追踪
+  const sortable = !isPowerSave
+    ? useSortable({
+        id: platform.id,
+        disabled: !isDragEnabled || isSelectMode
+      })
+    : null;
+
+  // 省电模式：直接渲染静态卡片，无拖拽包装
+  if (isPowerSave) {
+    return <StaticCard
+      platform={platform}
+      viewMode={viewMode}
+      isSelectMode={isSelectMode}
+      isSelected={isSelected}
+      onSelect={onSelect}
+      onStar={onStar}
+      onEdit={onEdit}
+      onGo={onGo}
+      index={index}
+    />;
+  }
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = sortable!;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -55,7 +95,7 @@ const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
         className={`relative ${isDragEnabled && !isSelectMode ? 'cursor-grab active:cursor-grabbing' : ''}`}
         {...(isDragEnabled && !isSelectMode ? listeners : {})}
       >
-        {/* 拖拽提示指示器 - 仅在拖拽模式下显示 */}
+        {/* 拖拽提示指示器 */}
         {isDragEnabled && !isSelectMode && (
           <div className="absolute top-1/2 left-2 -translate-y-1/2 z-20 opacity-30 hover:opacity-60 transition-opacity pointer-events-none">
             <span className="text-white/50">⋮⋮</span>
@@ -77,4 +117,4 @@ const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
   );
 };
 
-export default SortablePlatformCard;
+export default memo(SortablePlatformCard);

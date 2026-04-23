@@ -31,11 +31,12 @@ export const STORAGE_KEYS = {
   EFFECTS_MODE: 'ai_platforms_effects_mode',
   SELECTED_IDS: 'ai_platforms_selected_ids',
   HAS_VISITED: 'ai_platforms_has_visited',
-  GROUPS_CONFIG: 'ai_platforms_groups' // 新增分组存储键
+  GROUPS_CONFIG: 'ai_platforms_groups', // 新增分组存储键
+  POWER_SAVE: 'ai_platforms_power_save' // 极致省电模式
 } as const;
 
 // 配置版本号
-export const CONFIG_VERSION = 6; // 升级版本号
+export const CONFIG_VERSION = 7; // 升级版本号（新增省电模式存储）
 
 // 分类配置
 export const CATEGORIES: Array<{ id: string; name: string; icon: string }> = [
