@@ -3,9 +3,11 @@ import { poetryDatabase, quotesDatabase } from '../config/poetry';
 
 interface LandingPageProps {
   onStart: () => void;
+  isPowerSave?: boolean;
+  onTogglePowerSave?: () => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onStart, isPowerSave = false, onTogglePowerSave }) => {
   // 只维护索引作为唯一数据源，内容从索引派生，避免状态不同步
   const [poetryIndex, setPoetryIndex] = useState<number>(() =>
     Math.floor(Math.random() * poetryDatabase.length)
@@ -38,6 +40,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* 省电模式浮动切换按钮 */}
+      {onTogglePowerSave && (
+        <button
+          onClick={onTogglePowerSave}
+          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+            isPowerSave
+              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30'
+              : 'glass border border-white/20 text-white/80 hover:text-white hover:border-white/40'
+          }`}
+          aria-label={isPowerSave ? '关闭极致省电模式' : '开启极致省电模式'}
+          title={isPowerSave ? '已开启极致省电模式 - 点击关闭' : '开启极致省电模式（禁用动画/模糊/阴影，提升流畅度）'}
+        >
+          {isPowerSave ? '⚡ 省电模式' : '🔌 省电模式'}
+        </button>
+      )}
+
       {/* Hero区域 */}
       <section className="flex-1 flex items-center justify-center px-6 py-20">
         <div className="max-w-5xl mx-auto text-center">

@@ -339,7 +339,7 @@ function App() {
 
   // 如果显示落地页，返回落地页组件
   if (showLanding) {
-    return <LandingPage onStart={handleStart} />;
+    return <LandingPage onStart={handleStart} isPowerSave={isPowerSave} onTogglePowerSave={togglePowerSave} />;
   }
 
   return (
