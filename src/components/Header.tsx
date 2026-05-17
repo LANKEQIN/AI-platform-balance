@@ -182,10 +182,15 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* 极致省电模式切换 */}
+        {/* 极致省电模式切换按钮（使用 power-save-toggle 类名，确保省电模式下样式不被覆盖） */}
         <button
-          className={`btn btn-icon ${isPowerSave ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none scale-110' : ''}`}
-          onClick={onTogglePowerSave}
+          className={`btn btn-icon power-save-toggle ${isPowerSave ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onTogglePowerSave();
+          }}
+          type="button"
           aria-label={isPowerSave ? '关闭极致省电模式' : '开启极致省电模式'}
           title={isPowerSave ? '已开启极致省电模式 - 点击关闭' : '开启极致省电模式（禁用动画/模糊/阴影，提升流畅度）'}
         >

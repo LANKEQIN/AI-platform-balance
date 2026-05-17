@@ -503,6 +503,13 @@ body::after {
   transition-duration: 0.01ms !important;
 }
 
+/* 省电模式切换按钮：保留过渡效果，确保用户能感知到状态变化 */
+[data-power-save="true"] .power-save-toggle,
+[data-power-save="true"] .power-save-toggle::before,
+[data-power-save="true"] .power-save-toggle::after {
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
 [data-power-save="true"] {
   /* 禁用滚动行为动画 */
   scroll-behavior: auto !important;
@@ -554,6 +561,42 @@ body::after {
 [data-power-save="true"] .btn:active {
   transform: scale(0.97) !important;
   box-shadow: none !important;
+}
+
+/* 省电模式切换按钮：保留激活状态下的琥珀色渐变和视觉反馈，不被通用 .btn 规则覆盖 */
+[data-power-save="true"] .power-save-toggle {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+[data-power-save="true"] .power-save-toggle:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+[data-power-save="true"] .power-save-toggle:active {
+  transform: scale(0.95) !important;
+}
+
+/* 省电模式切换按钮：确保始终可点击 */
+.power-save-toggle {
+  position: relative !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* 省电模式已激活时：切换按钮保持琥珀色渐变背景，清晰标识当前状态 */
+[data-power-save="true"] .power-save-toggle.bg-gradient-to-r {
+  background: linear-gradient(to right, #f59e0b, #f97316) !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3) !important;
+  color: white !important;
+}
+
+[data-power-save="true"] .power-save-toggle.bg-gradient-to-r:hover {
+  background: linear-gradient(to right, #d97706, #ea580c) !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
 }
 
 [data-power-save="true"] .btn-primary {
@@ -705,8 +748,8 @@ body::after {
   padding: 8px 12px !important;
 }
 
-/* 省电模式下禁用所有阴影 */
-[data-power-save="true"] * {
+/* 省电模式下禁用所有阴影（切换按钮和横幅除外，保留其视觉反馈） */
+[data-power-save="true"] *:not(.power-save-toggle):not(.power-save-banner) {
   box-shadow: none !important;
   text-shadow: none !important;
 }
@@ -717,9 +760,9 @@ body::after {
   border-radius: 8px !important;
 }
 
-/* 省电模式下移除所有渐变（横幅除外） */
-[data-power-save="true"] .bg-gradient-to-br:not(.power-save-banner),
-[data-power-save="true"] .bg-gradient-to-r:not(.power-save-banner),
-[data-power-save="true"] [style*="gradient"]:not(.power-save-banner) {
+/* 省电模式下移除所有渐变（横幅和切换按钮除外） */
+[data-power-save="true"] .bg-gradient-to-br:not(.power-save-banner):not(.power-save-toggle),
+[data-power-save="true"] .bg-gradient-to-r:not(.power-save-banner):not(.power-save-toggle),
+[data-power-save="true"] [style*="gradient"]:not(.power-save-banner):not(.power-save-toggle) {
   background: #243634 !important;
 }

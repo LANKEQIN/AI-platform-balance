@@ -6,6 +6,7 @@ import { usePlatforms } from './hooks/usePlatforms';
 import { useToast } from './hooks/useToast';
 import { useStorage } from './hooks/useStorage';
 import { usePowerSave } from './hooks/usePowerSave';
+import { useDebug } from './hooks/useDebug';
 import { Platform, PlatformGroup } from './types/platform';
 import Header from './components/Header';
 import Toolbar from './components/Toolbar';
@@ -336,6 +337,38 @@ function App() {
     storage.setHasVisited();
     setShowLanding(false);
   }, [storage]);
+
+  // 调试工具 - 将应用状态暴露到 window.__debug 供 F12 控制台使用
+  useDebug(
+    {
+      theme,
+      isPowerSave,
+      viewMode,
+      searchKeyword,
+      currentCategory,
+      isSelectMode,
+      isDragEnabled,
+      platformsCount: platforms.length,
+      groupsCount: groups.length,
+      selectedIdsCount: selectedIds.size,
+      showLanding,
+      loading,
+    },
+    {
+      togglePowerSave,
+      toggleTheme,
+      setViewMode,
+      setSearchKeyword,
+      setCurrentCategory,
+      setIsSelectMode,
+      setIsDragEnabled,
+      showToast,
+    },
+    {
+      platformsCount: platforms.length,
+      groupsCount: groups.length,
+    }
+  );
 
   // 如果显示落地页，返回落地页组件
   if (showLanding) {

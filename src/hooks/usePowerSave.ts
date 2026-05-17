@@ -1,5 +1,17 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useStorage } from './useStorage';
+
+// 应用省电模式到 DOM
+const applyPowerSave = (enabled: boolean) => {
+  if (typeof document === 'undefined') return;
+
+  const html = document.documentElement;
+  if (enabled) {
+    html.setAttribute('data-power-save', 'true');
+  } else {
+    html.removeAttribute('data-power-save');
+  }
+};
 
 /**
  * 极致省电模式 Hook
@@ -16,67 +28,41 @@ export function usePowerSave() {
   const storage = useStorage();
 
   // 从 localStorage 读取初始状态
-  const [isPowerSave, setIsPowerSave] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return storage.getPowerSave();
-    }
-    return false;
-  });
+  const [isPowerSave, setIsPowerSave] = useState<boolean>(false);
 
-  // 记录是否已提示过自动检测（避免重复弹窗）
-  const hasPromptedRef = useRef(false);
-
-  // 检测设备性能并提示启用省电模式
+  // 初始化省电模式（仅在挂载时执行一次）
   useEffect(() => {
-    if (hasPromptedRef.current) return;
-
-    const checkPerformance = () => {
-      // 检测低内存设备（移动端或低性能设备）
-      const memory = (navigator as any).deviceMemory;
-      const cores = navigator.hardwareConcurrency || 2;
-
-      // 如果设备内存 <= 4GB 或 CPU 核心数 <= 2，提示启用省电模式
-      if ((memory && memory <= 4) || cores <= 2) {
-        hasPromptedRef.current = true;
-        // 不强制启用，仅自动建议已由 UI 层处理
-      }
-    };
-
-    // 延迟检测，避免影响首屏加载
-    const timer = setTimeout(checkPerformance, 3000);
-    return () => clearTimeout(timer);
+    const savedPowerSave = storage.getPowerSave();
+    setIsPowerSave(savedPowerSave);
+    applyPowerSave(savedPowerSave);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 当省电模式状态变化时，应用到 DOM 并持久化
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-
-    const html = document.documentElement;
-
-    if (isPowerSave) {
-      html.setAttribute('data-power-save', 'true');
-    } else {
-      html.removeAttribute('data-power-save');
-    }
-
-    // 持久化到 localStorage
-    storage.savePowerSave(isPowerSave);
-  }, [isPowerSave, storage]);
-
-  // 切换省电模式
+  // 切换省电模式（使用 useCallback 稳定函数引用）
   const togglePowerSave = useCallback(() => {
-    setIsPowerSave((prev) => !prev);
-  }, []);
+    setIsPowerSave(prev => {
+      const newValue = !prev;
+      // 同步应用到 DOM
+      applyPowerSave(newValue);
+      // 同步持久化到 localStorage
+      storage.savePowerSave(newValue);
+      return newValue;
+    });
+  }, [storage]);
 
   // 启用省电模式
   const enablePowerSave = useCallback(() => {
     setIsPowerSave(true);
-  }, []);
+    applyPowerSave(true);
+    storage.savePowerSave(true);
+  }, [storage]);
 
   // 禁用省电模式
   const disablePowerSave = useCallback(() => {
     setIsPowerSave(false);
-  }, []);
+    applyPowerSave(false);
+    storage.savePowerSave(false);
+  }, [storage]);
 
   return {
     isPowerSave,
