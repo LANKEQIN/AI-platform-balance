@@ -734,6 +734,12 @@ body::after {
   margin-top: 32px;
 }
 
+/* 省电模式下的 LandingPage 主内容区域调整位置 */
+[data-power-save="true"] main,
+[data-power-save="true"] section:first-of-type {
+  margin-top: 32px;
+}
+
 /* 省电模式下更明显的卡片样式 */
 [data-power-save="true"] .platform-card {
   background: #243634 !important;
@@ -760,9 +766,17 @@ body::after {
   border-radius: 8px !important;
 }
 
-/* 省电模式下移除所有渐变（横幅和切换按钮除外） */
-[data-power-save="true"] .bg-gradient-to-br:not(.power-save-banner):not(.power-save-toggle),
-[data-power-save="true"] .bg-gradient-to-r:not(.power-save-banner):not(.power-save-toggle),
-[data-power-save="true"] [style*="gradient"]:not(.power-save-banner):not(.power-save-toggle) {
+/* 省电模式下移除所有渐变（横幅和切换按钮以及渐变文字除外） */
+[data-power-save="true"] .bg-gradient-to-br:not(.power-save-banner):not(.power-save-toggle):not(.bg-clip-text),
+[data-power-save="true"] .bg-gradient-to-r:not(.power-save-banner):not(.power-save-toggle):not(.bg-clip-text),
+[data-power-save="true"] [style*="gradient"]:not(.power-save-banner):not(.power-save-toggle):not(.bg-clip-text) {
   background: #243634 !important;
+}
+
+/* 省电模式下渐变文字恢复为白色：移除渐变背景和裁剪，直接使用白色文字 */
+[data-power-save="true"] .bg-clip-text {
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  color: white !important;
+  background: none !important;
 }
