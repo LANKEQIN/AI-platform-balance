@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Platform, STORAGE_KEYS, CONFIG_VERSION, PlatformGroup, DEFAULT_GROUPS } from '../types/platform';
 import { DEFAULT_PLATFORMS } from '../config/platforms';
 
@@ -395,7 +395,8 @@ export function useStorage() {
     }
   }, [savePlatforms, saveGroups, saveTheme, saveViewMode, saveEffectsMode, validateImportConfig]);
 
-  return {
+  // 使用 useMemo 保持返回对象的引用稳定，避免无限循环
+  return useMemo(() => ({
     getPlatforms,
     savePlatforms,
     updatePlatform,
@@ -420,5 +421,29 @@ export function useStorage() {
     addGroup,
     updateGroup,
     deleteGroup
-  };
+  }), [
+    getPlatforms,
+    savePlatforms,
+    updatePlatform,
+    addPlatform,
+    deletePlatform,
+    getTheme,
+    saveTheme,
+    resetToDefault,
+    getViewMode,
+    saveViewMode,
+    exportConfig,
+    importConfig,
+    getHasVisited,
+    setHasVisited,
+    getEffectsMode,
+    saveEffectsMode,
+    getPowerSave,
+    savePowerSave,
+    getGroups,
+    saveGroups,
+    addGroup,
+    updateGroup,
+    deleteGroup
+  ]);
 }

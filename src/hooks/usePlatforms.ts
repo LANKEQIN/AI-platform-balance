@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Platform } from '../types/platform';
 import { useStorage } from './useStorage';
 
@@ -72,7 +72,8 @@ export function usePlatforms() {
     return defaultPlatforms;
   }, [storage]);
 
-  return {
+  // 使用 useMemo 保持返回对象的引用稳定
+  return useMemo(() => ({
     platforms,
     loading,
     setPlatforms: setPlatformsWithUpdater,
@@ -80,5 +81,5 @@ export function usePlatforms() {
     addPlatform,
     deletePlatform,
     resetToDefault
-  };
+  }), [platforms, loading, setPlatformsWithUpdater, updatePlatform, addPlatform, deletePlatform, resetToDefault]);
 }
