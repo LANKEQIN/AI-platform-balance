@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    open: true,  // 自动打开浏览器
     // 禁用开发服务器的 HTTP 缓存，确保每次都加载最新代码
     headers: {
       'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
