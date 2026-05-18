@@ -3,6 +3,9 @@ import { useStorage } from './useStorage';
 
 // 应用主题到 DOM
 const applyTheme = (theme: 'light' | 'dark') => {
+  // 防止 SSR 环境下出错
+  if (typeof document === 'undefined') return;
+  
   if (theme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
   } else {
@@ -22,15 +25,16 @@ export function useTheme() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 切换主题（使用函数式更新避免闭包陷阱）
+  // 当主题变化时，同步到 DOM 和 localStorage
+  useEffect(() => {
+    applyTheme(theme);
+    storage.saveTheme(theme);
+  }, [theme, storage]);
+
+  // 切换主题（使用函数式更新，依赖为空数组确保引用稳定）
   const toggleTheme = useCallback(() => {
-    setThemeState(prev => {
-      const newTheme = prev === 'light' ? 'dark' : 'light';
-      storage.saveTheme(newTheme);
-      applyTheme(newTheme);
-      return newTheme;
-    });
-  }, [storage]);
+    setThemeState(prev => prev === 'light' ? 'dark' : 'light');
+  }, []);
 
   return {
     theme,

@@ -38,31 +38,26 @@ export function usePowerSave() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 切换省电模式（使用 useCallback 稳定函数引用）
+  // 当省电模式状态变化时，同步到 DOM 和 localStorage
+  useEffect(() => {
+    applyPowerSave(isPowerSave);
+    storage.savePowerSave(isPowerSave);
+  }, [isPowerSave, storage]);
+
+  // 切换省电模式（使用函数式更新，依赖为空数组确保引用稳定）
   const togglePowerSave = useCallback(() => {
-    setIsPowerSave(prev => {
-      const newValue = !prev;
-      // 同步应用到 DOM
-      applyPowerSave(newValue);
-      // 同步持久化到 localStorage
-      storage.savePowerSave(newValue);
-      return newValue;
-    });
-  }, [storage]);
+    setIsPowerSave(prev => !prev);
+  }, []);
 
   // 启用省电模式
   const enablePowerSave = useCallback(() => {
     setIsPowerSave(true);
-    applyPowerSave(true);
-    storage.savePowerSave(true);
-  }, [storage]);
+  }, []);
 
   // 禁用省电模式
   const disablePowerSave = useCallback(() => {
     setIsPowerSave(false);
-    applyPowerSave(false);
-    storage.savePowerSave(false);
-  }, [storage]);
+  }, []);
 
   return {
     isPowerSave,
