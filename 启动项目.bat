@@ -17,6 +17,22 @@ echo [信息] 检测到 Node.js
 node -v
 echo.
 
+REM 清除 Vite 缓存（确保加载最新代码）
+if exist "node_modules\.vite" (
+    echo [信息] 正在清除 Vite 缓存...
+    rmdir /s /q "node_modules\.vite"
+    echo [信息] Vite 缓存已清除
+)
+
+REM 清除 Vite 配置缓存文件
+if exist "vite.config.ts.timestamp-*.mjs" (
+    echo [信息] 正在清除 Vite 配置缓存...
+    del /q "vite.config.ts.timestamp-*.mjs"
+    echo [信息] 配置缓存已清除
+)
+
+echo.
+
 REM 检查是否已安装依赖
 if not exist "node_modules" (
     echo [信息] 正在安装依赖...
@@ -34,6 +50,7 @@ echo.
 echo ========================================
 echo    服务器启动后将自动打开浏览器
 echo    访问地址: http://localhost:5173
+echo    提示: 如未看到更新，请按 Ctrl+F5 强制刷新
 echo ========================================
 echo.
 
