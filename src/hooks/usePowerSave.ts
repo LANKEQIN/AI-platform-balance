@@ -27,14 +27,14 @@ const applyPowerSave = (enabled: boolean) => {
 export function usePowerSave() {
   const storage = useStorage();
 
-  // 从 localStorage 读取初始状态
-  const [isPowerSave, setIsPowerSave] = useState<boolean>(false);
+  // 使用函数式初始化，直接从 localStorage 读取，确保首次渲染状态正确
+  const [isPowerSave, setIsPowerSave] = useState<boolean>(() => {
+    return storage.getPowerSave();
+  });
 
-  // 初始化省电模式（仅在挂载时执行一次）
+  // 初始化时应用省电模式到 DOM（仅在挂载时执行一次）
   useEffect(() => {
-    const savedPowerSave = storage.getPowerSave();
-    setIsPowerSave(savedPowerSave);
-    applyPowerSave(savedPowerSave);
+    applyPowerSave(isPowerSave);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

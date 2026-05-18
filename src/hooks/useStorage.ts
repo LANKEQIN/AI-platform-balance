@@ -267,11 +267,12 @@ export function useStorage() {
       theme: getTheme(),
       viewMode: getViewMode(),
       effectsMode: getEffectsMode(),
+      powerSave: getPowerSave(),
       exportTime: new Date().toISOString(),
       version: CONFIG_VERSION
     };
     return JSON.stringify(config, null, 2);
-  }, [getPlatforms, getGroups, getTheme, getViewMode, getEffectsMode]);
+  }, [getPlatforms, getGroups, getTheme, getViewMode, getEffectsMode, getPowerSave]);
 
   const validateImportConfig = useCallback((config: any): { valid: boolean; message: string; data: any } => {
     if (!config || typeof config !== 'object') {
@@ -323,7 +324,8 @@ export function useStorage() {
         platformsCount: config.platforms.length,
         groupsCount,
         theme: config.theme === 'dark' ? 'dark' : 'light',
-        viewMode: config.viewMode === 'list' ? 'list' : 'grid'
+        viewMode: config.viewMode === 'list' ? 'list' : 'grid',
+        powerSave: typeof config.powerSave === 'boolean' ? config.powerSave : false
       }
     };
   }, []);
@@ -369,6 +371,11 @@ export function useStorage() {
         saveEffectsMode(config.effectsMode);
       }
 
+      // 导入省电模式状态
+      if (typeof config.powerSave === 'boolean') {
+        savePowerSave(config.powerSave);
+      }
+
       return {
         success: true,
         message: '配置导入成功',
@@ -379,7 +386,8 @@ export function useStorage() {
           groupsCount: config.groups?.length || 0,
           theme: config.theme || 'light',
           viewMode: config.viewMode || 'grid',
-          effectsMode: config.effectsMode || 'simple'
+          effectsMode: config.effectsMode || 'simple',
+          powerSave: config.powerSave || false
         }
       };
     } catch (error) {
@@ -393,7 +401,7 @@ export function useStorage() {
       console.error('导入配置失败:', error);
       return { success: false, message: errorMessage };
     }
-  }, [savePlatforms, saveGroups, saveTheme, saveViewMode, saveEffectsMode, validateImportConfig]);
+  }, [savePlatforms, saveGroups, saveTheme, saveViewMode, saveEffectsMode, savePowerSave, validateImportConfig]);
 
   // 使用 useMemo 保持返回对象的引用稳定，避免无限循环
   return useMemo(() => ({
