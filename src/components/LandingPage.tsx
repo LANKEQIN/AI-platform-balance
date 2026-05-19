@@ -48,11 +48,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, isPowerSave = false,
       {/* 省电模式浮动切换按钮（使用 power-save-toggle 类名，确保省电模式下样式不被覆盖） */}
       {onTogglePowerSave && (
         <button
-          onClick={(e) => {
-            console.log('[LandingPage] 省电模式按钮被点击', e);
-            console.log('[LandingPage] onTogglePowerSave:', onTogglePowerSave);
-            onTogglePowerSave?.();
-          }}
+          onClick={() => onTogglePowerSave?.()}
           className={`power-save-toggle fixed right-4 z-50 px-4 py-2 rounded-full text-sm font-medium ${
             isPowerSave
               ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30'
