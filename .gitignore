@@ -61,3 +61,4 @@ release/
 *.sln
 *.sw?
 start-dev.bat
+docs/依赖版本更新计划.md
