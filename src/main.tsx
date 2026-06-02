@@ -9,8 +9,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>,
 )
 
-// Service Worker 注册
-if ('serviceWorker' in navigator) {
+// Service Worker 仅在生产环境注册（开发环境注册会导致缓存优先策略，代码更新无法即时生效）
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
