@@ -10,7 +10,6 @@ interface PlatformCardProps {
   onStar: (id: string) => void;
   onEdit: (platform: Platform) => void;
   onGo: (url: string) => void;
-  index: number;
 }
 
 /**
@@ -25,8 +24,7 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
   onSelect,
   onStar,
   onEdit,
-  onGo,
-  index: _index
+  onGo
 }) => {
   const isStarred = useMemo(() => platform.starred || false, [platform.starred]);
   const displayUrl = useMemo(() => platform.customUrl || platform.url, [platform.customUrl, platform.url]);

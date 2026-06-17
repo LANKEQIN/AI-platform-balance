@@ -13,7 +13,6 @@ interface SortablePlatformCardProps {
   onStar: (id: string) => void;
   onEdit: (platform: Platform) => void;
   onGo: (url: string) => void;
-  index: number;
   isDragEnabled?: boolean;
   isPowerSave?: boolean;
 }
@@ -23,7 +22,7 @@ interface SortablePlatformCardProps {
  * 不注册任何拖拽事件，避免 dnd-kit 的性能开销
  */
 const StaticCard: React.FC<Omit<SortablePlatformCardProps, 'isDragEnabled' | 'isPowerSave'>> = ({
-  platform, viewMode, isSelectMode, isSelected, onSelect, onStar, onEdit, onGo, index
+  platform, viewMode, isSelectMode, isSelected, onSelect, onStar, onEdit, onGo
 }) => (
   <PlatformCard
     platform={platform}
@@ -34,14 +33,14 @@ const StaticCard: React.FC<Omit<SortablePlatformCardProps, 'isDragEnabled' | 'is
     onStar={onStar}
     onEdit={onEdit}
     onGo={onGo}
-    index={index}
   />
 );
 
 /**
  * 可拖拽平台卡片包装组件
- * 省电模式下直接渲染纯展示卡片，不注册拖拽逻辑
- * 正常模式下使用 dnd-kit 实现拖拽排序
+ * 始终调用 useSortable（遵守 React Hooks 规则），
+ * 通过 disabled 参数控制是否启用拖拽；
+ * 省电模式下忽略拖拽属性，直接渲染纯展示卡片
  */
 const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
   platform,
@@ -52,19 +51,16 @@ const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
   onStar,
   onEdit,
   onGo,
-  index,
   isDragEnabled = true,
   isPowerSave = false
 }) => {
-  // 省电模式下不调用 useSortable，避免注册拖拽事件监听器和状态追踪
-  const sortable = !isPowerSave
-    ? useSortable({
-        id: platform.id,
-        disabled: !isDragEnabled || isSelectMode
-      })
-    : null;
+  // 始终调用 useSortable，避免违反 React Hooks 规则
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: platform.id,
+    disabled: !isDragEnabled || isSelectMode || isPowerSave
+  });
 
-  // 省电模式：直接渲染静态卡片，无拖拽包装
+  // 省电模式：直接渲染静态卡片，忽略拖拽包装
   if (isPowerSave) {
     return <StaticCard
       platform={platform}
@@ -75,11 +71,8 @@ const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
       onStar={onStar}
       onEdit={onEdit}
       onGo={onGo}
-      index={index}
     />;
   }
-
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = sortable!;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -110,7 +103,6 @@ const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
           onStar={onStar}
           onEdit={onEdit}
           onGo={onGo}
-          index={index}
         />
       </div>
     </div>

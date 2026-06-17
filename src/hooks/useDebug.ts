@@ -73,6 +73,11 @@ export function useDebug(
   }, [config]);
 
   useEffect(() => {
+    // 仅在开发环境注册调试工具，避免生产环境暴露内部状态
+    if (!import.meta.env.DEV) {
+      return;
+    }
+
     // 构建状态快照
     const getState = (): DebugStateSnapshot => ({ ...stateRef.current });
 

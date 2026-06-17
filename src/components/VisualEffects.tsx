@@ -55,6 +55,7 @@ const VisualEffects: React.FC = () => {
   useEffect(() => {
     let lastTime = performance.now();
     let frameCount = 0;
+    let rafId: number | null = null;  // 跟踪 RAF ID 以便清理
     
     const checkPerformance = () => {
       frameCount++;
@@ -71,7 +72,7 @@ const VisualEffects: React.FC = () => {
       }
       
       if (enableFullEffects) {
-        requestAnimationFrame(checkPerformance);
+        rafId = requestAnimationFrame(checkPerformance);
       }
     };
     
@@ -79,8 +80,12 @@ const VisualEffects: React.FC = () => {
       checkPerformance();
     }, 2000);
     
+    // 清理：同时取消定时器和 RAF，避免内存泄漏
     return () => {
       clearTimeout(timer);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, [enableFullEffects]);
 
