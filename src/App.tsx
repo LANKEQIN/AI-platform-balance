@@ -7,7 +7,7 @@ import { useToast } from './hooks/useToast';
 import { useStorage } from './hooks/useStorage';
 import { usePowerSave } from './hooks/usePowerSave';
 import { useDebug } from './hooks/useDebug';
-import { Platform, PlatformGroup } from './types/platform';
+import { Platform, PlatformGroup, isSafeUrl } from './types/platform';
 import Header from './components/Header';
 import Toolbar from './components/Toolbar';
 import PlatformCard from './components/PlatformCard';
@@ -31,11 +31,11 @@ const getGridClassName = (viewMode: 'grid' | 'list') => {
 
 function App() {
   // Hooks
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, setTheme } = useTheme();
   const { platforms, loading, updatePlatform, addPlatform, deletePlatform, setPlatforms, resetToDefault } = usePlatforms();
   const { toasts, showToast, removeToast } = useToast();
   const storage = useStorage();
-  const { isPowerSave, togglePowerSave } = usePowerSave();
+  const { isPowerSave, togglePowerSave, enablePowerSave, disablePowerSave } = usePowerSave();
 
   // 状态
   const [showLanding, setShowLanding] = useState(true);
@@ -137,8 +137,11 @@ function App() {
         const searchInput = document.getElementById('searchInput');
         searchInput?.focus();
       }
-      // Esc 关闭选择模式或模态框
+      // Esc 关闭选择模式（有弹窗打开时不处理，弹窗的 Esc 关闭由 Modal 组件自行负责，
+      // 避免一次 Esc 同时触发"关弹窗"和"退出选择模式"两个动作）
       if (e.key === 'Escape') {
+        const anyModalOpen = showEditModal || showAddModal || showGroupManager || showResetConfirm;
+        if (anyModalOpen) return;
         if (isSelectMode) {
           setIsSelectMode(false);
           setSelectedIds(new Set());
@@ -148,7 +151,7 @@ function App() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isSelectMode]);
+  }, [isSelectMode, showEditModal, showAddModal, showGroupManager, showResetConfirm]);
 
   // 过滤平台
   const filteredPlatforms = useMemo(() => {
@@ -246,8 +249,13 @@ function App() {
     showToast('平台已添加', 'success');
   }, [addPlatform, showToast, platforms]);
 
-  // 访问平台 - 添加错误处理
+  // 访问平台 - 校验协议安全 + 错误处理
   const handleGo = useCallback((url: string) => {
+    // 仅允许 http/https 协议，拦截 javascript: 等危险链接
+    if (!isSafeUrl(url)) {
+      showToast('链接不安全，仅支持 http/https 协议', 'error');
+      return;
+    }
     try {
       window.open(url, '_blank', 'noopener,noreferrer');
     } catch (error) {
@@ -276,10 +284,16 @@ function App() {
 
   // 批量打开 - 使用 refs 避免依赖项
   const handleBatchOpen = useCallback(() => {
+    let blockedCount = 0;
     selectedIdsRef.current.forEach((id: string) => {
       const platform = platformsRef.current.find(p => p.id === id);
       if (platform) {
         const url = platform.customUrl || platform.url;
+        // 跳过不安全的链接
+        if (!isSafeUrl(url)) {
+          blockedCount++;
+          return;
+        }
         try {
           window.open(url, '_blank', 'noopener,noreferrer');
         } catch (error) {
@@ -287,7 +301,10 @@ function App() {
         }
       }
     });
-  }, []);
+    if (blockedCount > 0) {
+      showToast(`已拦截 ${blockedCount} 个不安全的链接`, 'warning');
+    }
+  }, [showToast]);
 
   // 退出选择模式
   const handleCancelSelect = useCallback(() => {
@@ -310,28 +327,44 @@ function App() {
     showToast('配置已导出', 'success');
   }, [storage, showToast]);
 
-  // 导入配置 - 使用返回的平台数据，避免重复读取 localStorage
+  // 导入配置 - 同步刷新所有相关 React 状态（分组/主题/视图/省电模式）
   const handleImport = useCallback((content: string) => {
     const result = storage.importConfig(content);
     if (result.success && result.platforms) {
       setPlatforms(result.platforms);
+      // importConfig 已把分组和偏好设置写入 localStorage，这里从存储回读以同步界面状态
+      setGroups(storage.getGroups());
+      setTheme(storage.getTheme());
+      setViewMode(storage.getViewMode());
+      if (storage.getPowerSave()) {
+        enablePowerSave();
+      } else {
+        disablePowerSave();
+      }
       showToast(result.message, 'success');
     } else {
       showToast(result.message, 'error');
     }
-  }, [storage, setPlatforms, showToast]);
+  }, [storage, setPlatforms, setTheme, enablePowerSave, disablePowerSave, showToast]);
 
   // 显示重置确认弹窗
   const handleReset = useCallback(() => {
     setShowResetConfirm(true);
   }, []);
 
-  // 执行重置
+  // 执行重置 - 真正重置所有配置（平台/分组/主题/视图/省电模式）
   const handleConfirmReset = useCallback(() => {
-    const defaultPlatforms = resetToDefault();
-    setPlatforms(defaultPlatforms);
+    // usePlatforms.resetToDefault 内部已调用 setPlatforms，无需重复设置
+    resetToDefault();
+    // 同步重置其他 React 状态
+    setGroups(storage.getGroups());
+    setTheme('light');
+    setViewMode('grid');
+    disablePowerSave();
+    setSelectedIds(new Set());
+    setIsSelectMode(false);
     showToast('配置已重置', 'success');
-  }, [resetToDefault, setPlatforms, showToast]);
+  }, [resetToDefault, storage, setTheme, disablePowerSave, showToast]);
 
   // 处理开始使用
   const handleStart = useCallback(() => {
@@ -457,7 +490,8 @@ function App() {
                 strategy={rectSortingStrategy}
               >
                 <div className="space-y-8">
-                  {groups
+                  {/* 复制后再排序，避免原地变异 groups state */}
+                  {[...groups]
                     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
                     .map((group) => {
                       // 获取该分组下经过过滤的平台
@@ -537,7 +571,8 @@ function App() {
           ) : (
             /* 普通模式下按分组显示 */
             <div className="space-y-8">
-              {groups
+              {/* 复制后再排序，避免原地变异 groups state */}
+              {[...groups]
                 .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
                 .map((group) => {
                   // 获取该分组下经过过滤的平台

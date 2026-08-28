@@ -83,16 +83,23 @@ const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <div
-        className={`relative ${isDragEnabled && !isSelectMode ? 'cursor-grab active:cursor-grabbing' : ''}`}
-        {...(isDragEnabled && !isSelectMode ? listeners : {})}
-      >
-        {/* 拖拽提示指示器 */}
+    <div ref={setNodeRef} style={style}>
+      <div className="relative">
+        {/*
+          拖拽手柄：dnd-kit 的 attributes（role/tabIndex/aria）和 listeners 挂在专用按钮上，
+          而不是卡片外层 div——避免外层 div 变成包裹真实按钮的 role="button"（嵌套交互元素），
+          同时让键盘拖拽（聚焦手柄后按方向键）真正可用
+        */}
         {isDragEnabled && !isSelectMode && (
-          <div className="absolute top-1/2 left-2 -translate-y-1/2 z-20 opacity-30 hover:opacity-60 transition-opacity pointer-events-none">
-            <span className="text-white/50">⋮⋮</span>
-          </div>
+          <button
+            type="button"
+            aria-label="拖拽排序"
+            className="absolute top-1/2 left-2 -translate-y-1/2 z-20 p-1 opacity-50 hover:opacity-90 transition-opacity cursor-grab active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
+          >
+            <span className="text-white/70 select-none">⋮⋮</span>
+          </button>
         )}
         <PlatformCard
           platform={platform}

@@ -6,7 +6,7 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     id: 'volcengine',
     name: '火山引擎',
     category: '云服务商',
-    url: 'https://console.volcengine.com/finance/bill/detail',
+    url: 'https://console.volcengine.com/ark/region:cn-beijing/overview?briefPage=0&briefType=introduce&projectName=default&type=new',
     icon: '🌋',
     enabled: true,
     sortOrder: 0,

@@ -56,7 +56,7 @@ Write-Host "[信息] 正在启动开发服务器..." -ForegroundColor Yellow
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "   服务器启动后将自动打开浏览器" -ForegroundColor Cyan
-Write-Host "   访问地址: http://localhost:5173" -ForegroundColor Cyan
+Write-Host "   访问地址: http://localhost:5273" -ForegroundColor Cyan
 Write-Host "   提示: 如未看到更新，请按 Ctrl+F5 强制刷新" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
@@ -64,7 +64,7 @@ Write-Host ""
 # 异步打开浏览器
 Start-Job -ScriptBlock {
     Start-Sleep -Seconds 3
-    Start-Process "http://localhost:5173"
+    Start-Process "http://localhost:5273"
 } | Out-Null
 
 # 启动开发服务器

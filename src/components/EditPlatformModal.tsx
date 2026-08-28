@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
-import { Platform, PlatformGroup } from '../types/platform';
+import { Platform, PlatformGroup, isSafeUrl } from '../types/platform';
 import { DEFAULT_PLATFORMS } from '../config/platforms';
 
 interface EditPlatformModalProps {
@@ -47,8 +47,15 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
     }
   }, [platform, isOpen]);
 
+  // 链接是否合法（仅允许 http/https 协议）
+  const urlValid = isSafeUrl(url);
+
   const handleSave = () => {
-    if (!platform) return;
+    // 名称和链接为必填，且链接必须通过协议校验
+    if (!platform || !name.trim() || !url.trim() || !urlValid) return;
+
+    const trimmedName = name.trim();
+    const trimmedUrl = url.trim();
 
     // 查找默认平台
     const defaultPlatform = DEFAULT_PLATFORMS.find(p => p.id === platform.id);
@@ -56,17 +63,17 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
 
     // 如果是默认平台，检查是否修改了链接
     if (defaultPlatform) {
-      if (url !== defaultPlatform.url) {
-        customUrl = url;
+      if (trimmedUrl !== defaultPlatform.url) {
+        customUrl = trimmedUrl;
       }
     } else {
       // 自定义平台，始终保存链接
-      customUrl = url;
+      customUrl = trimmedUrl;
     }
 
     const updatedPlatform: Platform = {
       ...platform,
-      name,
+      name: trimmedName,
       category,
       groupId,
       customUrl,
@@ -117,7 +124,11 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
               删除
             </button>
           )}
-          <button className="btn btn-primary" onClick={handleSave}>
+          <button
+            className="btn btn-primary"
+            onClick={handleSave}
+            disabled={!name.trim() || !url.trim() || !urlValid}
+          >
             保存
           </button>
         </>
@@ -154,6 +165,12 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
             onChange={(e) => setUrl(e.target.value)}
             autoComplete="url"
           />
+          {/* 链接已填写但协议不合法时给出提示 */}
+          {url.trim() !== '' && !urlValid && (
+            <p className="text-xs text-red-400 mt-1">
+              链接格式不正确，需以 http:// 或 https:// 开头
+            </p>
+          )}
           {platform && (
             <p className="text-xs text-white/60 mt-1">
               默认链接: <span className="text-white/80">{platform.url}</span>

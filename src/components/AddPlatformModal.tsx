@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
-import { PlatformGroup } from '../types/platform';
+import { PlatformGroup, isSafeUrl } from '../types/platform';
 
 interface AddPlatformModalProps {
   isOpen: boolean;
@@ -30,8 +30,11 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, gr
     }
   }, [isOpen]);
 
+  // 链接是否合法（仅允许 http/https 协议）
+  const urlValid = isSafeUrl(url);
+
   const handleSave = () => {
-    if (!name.trim() || !url.trim()) {
+    if (!name.trim() || !url.trim() || !urlValid) {
       return;
     }
 
@@ -56,7 +59,7 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, gr
           <button className="btn btn-secondary" onClick={onClose}>
             取消
           </button>
-          <button className="btn btn-primary" onClick={handleSave} disabled={!name.trim() || !url.trim()}>
+          <button className="btn btn-primary" onClick={handleSave} disabled={!name.trim() || !url.trim() || !urlValid}>
             添加
           </button>
         </>
@@ -97,6 +100,12 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, gr
             required
             aria-required="true"
           />
+          {/* 链接已填写但协议不合法时给出提示 */}
+          {url.trim() !== '' && !urlValid && (
+            <p className="text-xs text-red-400 mt-1">
+              链接格式不正确，需以 http:// 或 https:// 开头
+            </p>
+          )}
         </div>
 
         {/* 分类 */}

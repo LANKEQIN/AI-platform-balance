@@ -9,10 +9,11 @@
  * - API 请求：networkFirst（优先网络，离线时回退缓存）
  */
 
-const CACHE_NAME = 'ai-platforms-v4';
+const CACHE_NAME = 'ai-platforms-v5';
 
-// Vite 构建产物中的资源文件名含哈希值，如 assets/index-abc123.js
-const HASHED_ASSET_PATTERN = /\/assets\/[^/]+-[a-f0-9]{8,}\./;
+// Vite 构建产物中的资源文件名含哈希值，如 assets/index-Dq2g0OqY.js
+// 注意：Vite 5 的哈希是 base64url 编码（含大小写字母、数字、-、_），不是纯小写十六进制
+const HASHED_ASSET_PATTERN = /\/assets\/[^/]+-[A-Za-z0-9_-]{8,}\./;
 
 function isHtmlRequest(url) {
   const pathname = new URL(url).pathname;
@@ -72,7 +73,24 @@ function networkFirst(event) {
       })
       .catch(() => {
         return caches.match(event.request).then((cachedResponse) => {
-          return cachedResponse || caches.match('./index.html');
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          // 仅页面导航回退到 index.html；API 等请求不能返回 HTML，应明确返回 503
+          if (isHtmlRequest(event.request.url)) {
+            return caches.match('./index.html').then((fallback) => {
+              return fallback || new Response('离线状态，页面尚未缓存', {
+                status: 503,
+                statusText: 'Offline',
+                headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+              });
+            });
+          }
+          return new Response('离线状态，且无缓存数据', {
+            status: 503,
+            statusText: 'Offline',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+          });
         });
       })
   );

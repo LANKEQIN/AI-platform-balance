@@ -23,8 +23,8 @@ function createWindow() {
 
   // 根据环境加载不同的URL
   if (process.env.NODE_ENV === 'development') {
-    // 开发模式：加载Vite开发服务器
-    mainWindow.loadURL('http://localhost:5173');
+    // 开发模式：加载Vite开发服务器（端口5273，原5173被系统保留）
+    mainWindow.loadURL('http://localhost:5273');
     // 打开开发者工具
     mainWindow.webContents.openDevTools();
   } else {

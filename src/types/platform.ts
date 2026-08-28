@@ -50,3 +50,16 @@ export const CATEGORIES: Array<{ id: string; name: string; icon: string }> = [
 export const DEFAULT_GROUPS: PlatformGroup[] = [
   { id: 'default', name: '默认分组', icon: '📦', sortOrder: 0 }
 ];
+
+/**
+ * 校验 URL 是否为安全的 http/https 链接
+ * 防止 javascript: 等危险协议经 window.open 注入脚本
+ */
+export function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url.trim());
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}

@@ -69,6 +69,14 @@ const GroupManagerModal: React.FC<GroupManagerModalProps> = ({
     setGroupIcon('📦');
   };
 
+  // 删除分组：若正在编辑该分组，先退出编辑态，避免之后点保存静默失败
+  const handleDeleteGroup = (groupId: string) => {
+    if (editingGroupId === groupId) {
+      handleCancelEdit();
+    }
+    onDeleteGroup(groupId);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -167,7 +175,7 @@ const GroupManagerModal: React.FC<GroupManagerModalProps> = ({
                   </button>
                   {group.id !== 'default' && (
                     <button
-                      onClick={() => onDeleteGroup(group.id)}
+                      onClick={() => handleDeleteGroup(group.id)}
                       className="w-8 h-8 rounded-lg bg-red-500/20 hover:bg-red-500/40 flex items-center justify-center text-red-400 hover:text-red-300"
                       aria-label="删除分组"
                     >

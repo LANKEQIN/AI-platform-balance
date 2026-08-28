@@ -36,9 +36,15 @@ export function useTheme() {
     setThemeState(prev => prev === 'light' ? 'dark' : 'light');
   }, []);
 
+  // 直接设置主题（导入配置、重置配置时使用）
+  const setTheme = useCallback((newTheme: 'light' | 'dark') => {
+    setThemeState(newTheme);
+  }, []);
+
   return {
     theme,
     isDark: theme === 'dark',
-    toggleTheme
+    toggleTheme,
+    setTheme
   };
 }

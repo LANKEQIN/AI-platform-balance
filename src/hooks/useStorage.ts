@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { Platform, STORAGE_KEYS, CONFIG_VERSION, PlatformGroup, DEFAULT_GROUPS } from '../types/platform';
+import { Platform, STORAGE_KEYS, CONFIG_VERSION, PlatformGroup, DEFAULT_GROUPS, isSafeUrl } from '../types/platform';
 import { DEFAULT_PLATFORMS } from '../config/platforms';
 
 function isValidPlatform(obj: any): obj is Platform {
@@ -11,7 +11,10 @@ function isValidPlatform(obj: any): obj is Platform {
     typeof obj.category === 'string' &&
     typeof obj.url === 'string' &&
     typeof obj.icon === 'string' &&
-    typeof obj.enabled === 'boolean'
+    typeof obj.enabled === 'boolean' &&
+    // 链接必须通过协议白名单校验，防止 javascript: 协议注入
+    isSafeUrl(obj.url) &&
+    (obj.customUrl === undefined || (typeof obj.customUrl === 'string' && isSafeUrl(obj.customUrl)))
   );
 }
 
@@ -113,8 +116,14 @@ export function useStorage() {
     localStorage.setItem(STORAGE_KEYS.THEME, theme);
   }, []);
 
+  // 真正重置所有配置：平台、分组及各项偏好设置全部清除
   const resetToDefault = useCallback((): Platform[] => {
     localStorage.removeItem(STORAGE_KEYS.PLATFORMS_CONFIG);
+    localStorage.removeItem(STORAGE_KEYS.GROUPS_CONFIG);
+    localStorage.removeItem(STORAGE_KEYS.THEME);
+    localStorage.removeItem(STORAGE_KEYS.VIEW_MODE);
+    localStorage.removeItem(STORAGE_KEYS.EFFECTS_MODE);
+    localStorage.removeItem(STORAGE_KEYS.POWER_SAVE);
     localStorage.setItem(STORAGE_KEYS.CONFIG_VERSION, String(CONFIG_VERSION));
     return JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
   }, []);
@@ -188,33 +197,6 @@ export function useStorage() {
       return false;
     }
   }, []);
-
-  const updatePlatform = useCallback((platformId: string, updates: Partial<Platform>): boolean => {
-    const platforms = getPlatforms();
-    const index = platforms.findIndex(p => p.id === platformId);
-    if (index !== -1) {
-      platforms[index] = { ...platforms[index], ...updates };
-      return savePlatforms(platforms);
-    }
-    return false;
-  }, [getPlatforms, savePlatforms]);
-
-  const addPlatform = useCallback((platform: Omit<Platform, 'id' | 'enabled'>): boolean => {
-    const platforms = getPlatforms();
-    const newPlatform: Platform = {
-      ...platform,
-      id: 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-      enabled: true
-    };
-    platforms.push(newPlatform);
-    return savePlatforms(platforms);
-  }, [getPlatforms, savePlatforms]);
-
-  const deletePlatform = useCallback((platformId: string): boolean => {
-    const platforms = getPlatforms();
-    const filtered = platforms.filter(p => p.id !== platformId);
-    return savePlatforms(filtered);
-  }, [getPlatforms, savePlatforms]);
 
   const addGroup = useCallback((group: Omit<PlatformGroup, 'id' | 'sortOrder'>): boolean => {
     const groups = getGroups();
@@ -407,9 +389,6 @@ export function useStorage() {
   return useMemo(() => ({
     getPlatforms,
     savePlatforms,
-    updatePlatform,
-    addPlatform,
-    deletePlatform,
     getTheme,
     saveTheme,
     resetToDefault,
@@ -432,9 +411,6 @@ export function useStorage() {
   }), [
     getPlatforms,
     savePlatforms,
-    updatePlatform,
-    addPlatform,
-    deletePlatform,
     getTheme,
     saveTheme,
     resetToDefault,

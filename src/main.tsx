@@ -12,7 +12,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // Service Worker 仅在生产环境注册（开发环境注册会导致缓存优先策略，代码更新无法即时生效）
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    // 使用相对路径（基于 base: './'），确保子路径部署时也能正确注册
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`)
       .then((registration) => {
         console.log('Service Worker 注册成功:', registration.scope);
       })
