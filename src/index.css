@@ -2,78 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ==================== CSS变量定义 - 语义化色彩系统 ==================== */
+/* ==================== 设计 Tokens - 现代极简 ==================== */
 :root {
-  /* 玻璃效果 */
-  --glass-bg: rgba(255, 255, 255, 0.12);
-  --glass-bg-hover: rgba(255, 255, 255, 0.18);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-border-strong: rgba(255, 255, 255, 0.35);
-  --glass-shadow: rgba(31, 38, 135, 0.37);
+  /* 表面与背景 */
+  --bg-page: #fafafa;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f5f5f5;
+  --border: #eaeaea;
+  --border-strong: #d4d4d4;
 
-  /* 背景渐变 - 青色系（柔和版） */
-  --bg-gradient-1: #0f766e;
-  --bg-gradient-2: #0e5d56;
-  --bg-gradient-3: #115e59;
-  --bg-gradient-4: #134e4a;
+  /* 文字 */
+  --text-primary: #171717;
+  --text-secondary: #737373;
+  --text-muted: #a3a3a3;
 
-  /* 文字颜色 */
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.85);
-  --text-muted: rgba(255, 255, 255, 0.65);
-  --text-inverse: #1f2937;
+  /* 品牌青点缀 */
+  --accent: #0d9488;
+  --accent-hover: #0f766e;
+  --accent-contrast: #ffffff;
+  --accent-soft: #f0fdfa;
 
-  /* 阴影 */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(31, 38, 135, 0.12);
-  --shadow-lg: 0 8px 32px rgba(31, 38, 135, 0.15);
-  --shadow-glow: 0 0 40px rgba(20, 184, 166, 0.15);
+  /* 危险色 */
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+
+  /* 阴影（微投影） */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   /* 圆角 */
   --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-
-  /* 间距 */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
 
   /* 动画时间 */
   --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 400ms;
+  --duration-normal: 200ms;
 
   /* 触控目标最小尺寸 */
   --touch-target-min: 44px;
 
-  /* z-index层级 */
-  --z-base: 1;
+  /* z-index 层级 */
   --z-sticky: 100;
   --z-dropdown: 200;
   --z-modal: 1000;
   --z-toast: 2000;
 }
 
-/* 深色模式变量 */
+/* 深色模式 tokens */
 [data-theme="dark"] {
-  --glass-bg: rgba(17, 25, 40, 0.7);
-  --glass-bg-hover: rgba(17, 25, 40, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-border-strong: rgba(255, 255, 255, 0.2);
-  --glass-shadow: rgba(0, 0, 0, 0.4);
-  --text-primary: #f3f4f6;
-  --text-secondary: rgba(255, 255, 255, 0.8);
-  --text-muted: rgba(255, 255, 255, 0.6);
-  --text-inverse: #1f2937;
-  --bg-gradient-1: #042f2e;
-  --bg-gradient-2: #134e4a;
-  --bg-gradient-3: #0f766e;
-  --bg-gradient-4: #115e59;
-  --shadow-glow: 0 0 60px rgba(20, 184, 166, 0.25);
+  --bg-page: #0a0a0a;
+  --bg-surface: #141414;
+  --bg-surface-hover: #1f1f1f;
+  --border: #262626;
+  --border-strong: #404040;
+
+  --text-primary: #fafafa;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+
+  --accent: #14b8a6;
+  --accent-hover: #2dd4bf;
+  --accent-contrast: #0a0a0a;
+  --accent-soft: rgba(20, 184, 166, 0.1);
+
+  --danger: #ef4444;
+  --danger-hover: #f87171;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* ==================== 基础样式 ==================== */
@@ -92,21 +89,15 @@ html {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg-page);
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
-  position: relative;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background var(--duration-normal) ease, color var(--duration-normal) ease;
 }
-
-/*
- * 注意：不要在 body 上设置 perspective 或 backface-visibility
- * perspective: 1000px 会强制为所有子元素创建 3D 渲染上下文
- * 导致滚动时浏览器需要不断重计算，造成严重卡顿
- * 如需硬件加速，仅在具体元素上使用 transform: translateZ(0)
- */
 
 /* 防止闪烁的优化 */
 img, video, iframe, canvas, svg {
@@ -114,156 +105,140 @@ img, video, iframe, canvas, svg {
   max-width: 100%;
 }
 
-/* 硬件加速提示 */
-.gpu-accelerated {
-  transform: translateZ(0);
-  will-change: transform;
+/* ==================== 语义化文本类 ==================== */
+.text-primary {
+  color: var(--text-primary);
 }
 
-/* 静态渐变背景 - 完全禁用动态动画 */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    135deg,
-    var(--bg-gradient-1) 0%,
-    var(--bg-gradient-2) 25%,
-    var(--bg-gradient-3) 50%,
-    var(--bg-gradient-4) 75%,
-    var(--bg-gradient-1) 100%
-  );
-  background-size: 100% 100%;
-  z-index: -2;
-  contain: strict;
+.text-secondary {
+  color: var(--text-secondary);
 }
 
-/* 静态光晕层 - 完全禁用动态动画 */
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(ellipse at 20% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.12) 0%, transparent 50%);
-  z-index: -1;
-  pointer-events: none;
-  contain: strict;
+.text-muted {
+  color: var(--text-muted);
 }
 
-/* 玻璃效果组件 - 降低 blur 从 20px 到 12px，大幅减少 GPU 开销 */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  transition: background var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1),
-              border-color var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
+/* hover 提色工具：组件中 hover:text-primary 由 Tailwind 生成需 primary DEFAULT（未配置），
+   且未分层 .text-secondary 会覆盖 utilities 层规则，故手写同名未分层规则保证悬停反馈生效 */
+.hover\:text-primary:hover {
+  color: var(--text-primary);
 }
 
-.glass-hover:hover {
-  background: var(--glass-bg-hover);
-  border-color: var(--glass-border-strong);
+.hover\:text-secondary:hover {
+  color: var(--text-secondary);
 }
 
-/* 按钮基础样式 */
+/* ==================== 表面类（替代原玻璃拟态 .glass） ==================== */
+.surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--duration-normal) ease,
+              box-shadow var(--duration-normal) ease,
+              background var(--duration-normal) ease,
+              color var(--duration-normal) ease;
+}
+
+/* 可交互表面的悬停态 */
+.surface-hover:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+/* ==================== 按钮 ==================== */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--glass-border);
+  padding: 8px 16px;
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background var(--duration-fast) ease,
+              border-color var(--duration-fast) ease,
+              color var(--duration-fast) ease;
   white-space: nowrap;
-  position: relative;
-  overflow: hidden;
   min-height: var(--touch-target-min);
   min-width: var(--touch-target-min);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.btn:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
 }
 
 .btn:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 主按钮：品牌青实底 */
 .btn-primary {
-  background: linear-gradient(135deg, #6366f1, #818cf8);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
+/* 次按钮：表面底细边（与 .btn 默认一致，显式声明便于阅读） */
 .btn-secondary {
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--bg-surface);
+  border-color: var(--border);
   color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover {
-  background: var(--glass-bg-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
 }
 
+/* 危险按钮：实红底 */
 .btn-danger {
-  background: linear-gradient(135deg, #ef4444, #f87171);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .btn-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
 }
 
+/* 图标按钮：方形表面按钮 */
 .btn-icon {
   width: var(--touch-target-min);
   height: var(--touch-target-min);
   padding: 0;
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  font-size: 1.2rem;
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
+  font-size: 1.1rem;
   flex-shrink: 0;
-  transition: all var(--duration-normal) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-icon:hover {
-  background: var(--glass-bg-hover);
-  transform: scale(1.05);
-}
-
-/* 表单样式 */
+/* ==================== 表单 ==================== */
 .form-input,
 .form-select {
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--glass-border);
+  padding: 8px 12px;
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-surface);
   color: var(--text-primary);
   font-size: 0.875rem;
-  transition: all var(--duration-normal) ease;
+  transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
   min-height: var(--touch-target-min);
 }
 
@@ -274,43 +249,21 @@ body::after {
 .form-input:focus,
 .form-select:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
-/* ==================== 动画定义 ==================== */
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+/* 下拉选项适配深色底 */
+.form-select option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
 }
 
-@keyframes auroraMove {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translate(20px, -10px) rotate(5deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-10px, 15px) rotate(-5deg);
-    opacity: 0.9;
-  }
-}
-
+/* ==================== 动画定义（精简保留） ==================== */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -318,30 +271,10 @@ body::after {
   }
 }
 
-@keyframes fadeInUpStagger {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes pulseSoft {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
@@ -349,124 +282,12 @@ body::after {
   }
 }
 
-/* 按钮闪光扫过效果 */
-@keyframes shine {
-  0% {
-    left: -100%;
-  }
-  20%, 100% {
-    left: 150%;
-  }
-}
-
-/* 按钮内发光脉冲 */
-@keyframes glowPulse {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(20, 184, 166, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(20, 184, 166, 0.6), 0 0 30px rgba(6, 182, 212, 0.4);
-  }
-}
-
-/* 按钮悬浮弹跳效果 */
-@keyframes bounceSoft {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-/* 卡片悬浮呼吸光效 */
-@keyframes cardBreath {
-  0%, 100% {
-    box-shadow: 0 4px 16px rgba(31, 38, 135, 0.12);
-  }
-  50% {
-    box-shadow: 0 4px 16px rgba(31, 38, 135, 0.12), 0 0 30px var(--card-glow-color, rgba(20, 184, 166, 0.3));
-  }
-}
-
-/* 图标旋转摇摆效果 */
-@keyframes iconWobble {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-8deg);
-  }
-  75% {
-    transform: rotate(8deg);
-  }
-}
-
-/* 动画实用类 */
 .animate-fade-in-up {
   animation: fadeInUp var(--duration-normal) ease-out;
 }
 
-.animate-fade-in-up-stagger {
-  animation: fadeInUpStagger 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-.animate-pulse-soft {
-  opacity: 0.9;
-}
-
 .animate-scale-in {
   animation: scaleIn var(--duration-normal) ease-out;
-}
-
-.animate-card-breath {
-  /* 禁用呼吸动画 */
-}
-
-.animate-icon-wobble:hover {
-  /* 禁用摇摆动画 */
-}
-
-/* 增强按钮样式 */
-.btn {
-  /* 闪光效果层 */
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transition: left 0.5s;
-  pointer-events: none;
-}
-
-.btn:hover::before {
-  left: 100%;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-.btn-primary {
-  box-shadow: 0 0 10px rgba(20, 184, 166, 0.3);
-}
-
-/* 按钮 active 状态增强 */
-.btn:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 20px rgba(20, 184, 166, 0.5) inset;
 }
 
 /* 减少动画模式 */
@@ -482,245 +303,59 @@ body::after {
 
 /* ==================== 极致省电模式 ==================== */
 /**
- * 极致省电模式通过 data-power-save="true" 属性激活
- * 核心优化策略：
- * 1. 禁用所有 CSS 动画和过渡（减少 GPU/CPU 开销）
- * 2. 移除 backdrop-filter 模糊（减少 composite 开销）
- * 3. 替换渐变为纯色（减少 paint 开销）
- * 4. 简化阴影为最小或无（减少 paint 开销）
- * 5. 强制硬件加速但禁用 transform 动画
- * 6. 简化卡片和按钮样式
+ * 极简风本身已无渐变/无模糊/微动画，
+ * 省电模式仅需：禁用全部过渡与动画、移除阴影、显示顶部横幅
  */
 [data-power-save="true"] *,
 [data-power-save="true"] *::before,
 [data-power-save="true"] *::after {
-  /* 彻底禁用动画 */
   animation: none !important;
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  /* 彻底禁用过渡 */
   transition: none !important;
-  transition-duration: 0.01ms !important;
 }
 
-/* 省电模式切换按钮：保留过渡效果，确保用户能感知到状态变化 */
+/* 省电模式切换按钮：保留过渡，确保用户能感知状态变化 */
 [data-power-save="true"] .power-save-toggle,
 [data-power-save="true"] .power-save-toggle::before,
 [data-power-save="true"] .power-save-toggle::after {
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
 }
 
 [data-power-save="true"] {
-  /* 禁用滚动行为动画 */
   scroll-behavior: auto !important;
 }
 
-/* 禁用背景固定层的复杂效果 */
-[data-power-save="true"] body::before {
-  background: var(--bg-gradient-2) !important;
-  background-size: 100% 100% !important;
-}
-
-[data-power-save="true"] body::after {
-  display: none !important;
-}
-
-/* 禁用玻璃效果：移除 backdrop-filter */
-[data-power-save="true"] .glass,
-[data-power-save="true"] header.glass,
-[data-power-save="true"] .btn-secondary,
-[data-power-save="true"] .btn-icon {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* 简化头部阴影 */
-[data-power-save="true"] header {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* 简化按钮样式 */
-[data-power-save="true"] .btn {
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: none !important;
-  transform: none !important;
-  overflow: visible !important;
-}
-
-[data-power-save="true"] .btn::before {
-  display: none !important;
-}
-
-[data-power-save="true"] .btn:hover {
-  background: rgba(255, 255, 255, 0.25) !important;
-  transform: none !important;
+/* 移除全部阴影（横幅与切换按钮除外，保留视觉反馈） */
+[data-power-save="true"] *:not(.power-save-toggle):not(.power-save-banner) {
   box-shadow: none !important;
 }
 
-[data-power-save="true"] .btn:active {
-  transform: scale(0.97) !important;
-  box-shadow: none !important;
-}
-
-/* 省电模式切换按钮：保留激活状态下的琥珀色渐变和视觉反馈，不被通用 .btn 规则覆盖 */
-[data-power-save="true"] .power-save-toggle {
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
-}
-
-[data-power-save="true"] .power-save-toggle:hover {
-  background: rgba(255, 255, 255, 0.25) !important;
-}
-
-[data-power-save="true"] .power-save-toggle:active {
-  transform: scale(0.95) !important;
-}
-
-/* 省电模式切换按钮：确保始终可点击 */
+/* 省电模式切换按钮：确保始终可点击（不强制 position，避免覆盖 LandingPage 浮动按钮的 fixed 定位） */
 .power-save-toggle {
-  position: relative !important;
   z-index: 9999 !important;
   pointer-events: auto !important;
   cursor: pointer !important;
 }
 
-/* 省电模式已激活时：切换按钮保持琥珀色渐变背景，清晰标识当前状态 */
-[data-power-save="true"] .power-save-toggle.bg-gradient-to-r {
-  background: linear-gradient(to right, #f59e0b, #f97316) !important;
-  border: none !important;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3) !important;
-  color: white !important;
+/* 省电模式已激活时：切换按钮保持琥珀色实底，清晰标识当前状态 */
+[data-power-save="true"] .power-save-toggle.bg-amber-active {
+  background: #f59e0b !important;
+  border-color: #f59e0b !important;
+  color: #ffffff !important;
 }
 
-[data-power-save="true"] .power-save-toggle.bg-gradient-to-r:hover {
-  background: linear-gradient(to right, #d97706, #ea580c) !important;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
-}
-
-[data-power-save="true"] .btn-primary {
-  background: #0d9488 !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-[data-power-save="true"] .btn-primary:hover {
-  background: #0f766e !important;
-  box-shadow: none !important;
-}
-
-/* 简化卡片样式 */
-[data-power-save="true"] .platform-card {
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-}
-
-[data-power-save="true"] .platform-card:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-/* 简化表单输入框 */
-[data-power-save="true"] .form-input,
-[data-power-save="true"] .form-select {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: none !important;
-}
-
-[data-power-save="true"] .form-input:focus,
-[data-power-save="true"] .form-select:focus {
-  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.5) !important;
-}
-
-/* 禁用模态框动画 */
-[data-power-save="true"] .modal-overlay,
-[data-power-save="true"] .modal-content {
-  animation: none !important;
-  transition: none !important;
-}
-
-/* 简化下拉菜单 */
-[data-power-save="true"] [role="menu"] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* 禁用图标旋转和浮动效果 */
-[data-power-save="true"] .theme-icon {
-  transition: none !important;
-}
-
-[data-power-save="true"] .theme-icon:hover {
-  transform: none !important;
-}
-
-/* 拖拽覆盖层简化 */
-[data-power-save="true"] [data-drag-overlay="true"] {
-  opacity: 1 !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-/* Toast 通知简化 */
-[data-power-save="true"] .toast-enter {
-  animation: none !important;
-}
-
-/* 性能优化：强制 will-change 为 auto，避免过度内存占用 */
-[data-power-save="true"] .gpu-accelerated {
-  will-change: auto !important;
-  transform: none !important;
-}
-
-/* 列表项简化 */
-[data-power-save="true"] [role="listitem"] {
-  transition: none !important;
-}
-
-/* 列表项优化：使用 content-visibility 避免视口外渲染 */
-[data-power-save="true"] .platform-card {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 200px;
-}
-
-/* 简化网格容器，避免复杂的布局计算 */
-[data-power-save="true"] main .grid {
-  contain: layout style paint;
-}
-
-/* 禁用固定伪元素背景，减少滚动时的合成层压力 */
-[data-power-save="true"] body::before,
-[data-power-save="true"] body::after {
-  content: none !important;
-  display: none !important;
-}
-
-/* 省电模式下的 body 背景使用纯色，避免渐变重绘 */
-[data-power-save="true"] body {
-  background: #1a2e2c !important;
-}
-
-/* ==================== 省电模式增强视觉反馈 ==================== */
-/* 省电模式顶部横幅 - 使用高优先级确保不被覆盖 */
+/* ==================== 省电模式顶部横幅 ==================== */
 .power-save-banner {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  background: linear-gradient(90deg, #f59e0b, #d97706) !important;
-  color: white !important;
+  background: #f59e0b !important;
+  color: #ffffff !important;
   text-align: center !important;
   padding: 6px 16px !important;
   font-size: 13px !important;
   font-weight: 600 !important;
   z-index: 9999 !important;
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3) !important;
   display: none !important;
   pointer-events: none !important;
 }
@@ -729,61 +364,12 @@ body::after {
   display: block !important;
 }
 
-/* 省电模式下的 header 调整位置 */
+/* 省电模式下 header 与主内容下移，避开固定横幅 */
 [data-power-save="true"] header {
   margin-top: 32px;
 }
 
-/* 省电模式下的 LandingPage 主内容区域调整位置 */
 [data-power-save="true"] main,
 [data-power-save="true"] section:first-of-type {
   margin-top: 32px;
-}
-
-/* 省电模式下更明显的卡片样式 */
-[data-power-save="true"] .platform-card {
-  background: #243634 !important;
-  border: 1px solid #3d5350 !important;
-  border-radius: 8px !important;
-  padding: 12px !important;
-}
-
-/* 省电模式下简化按钮 */
-[data-power-save="true"] .btn {
-  border-radius: 6px !important;
-  padding: 8px 12px !important;
-}
-
-/* 省电模式下禁用所有阴影（切换按钮和横幅除外，保留其视觉反馈） */
-[data-power-save="true"] *:not(.power-save-toggle):not(.power-save-banner) {
-  box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-/* 确保省电模式横幅和切换按钮的渐变背景不被移除 - 高优先级规则 */
-[data-power-save="true"] .power-save-banner,
-[data-power-save="true"] .power-save-toggle.bg-gradient-to-r {
-  background: linear-gradient(90deg, #f59e0b, #d97706) !important;
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3) !important;
-}
-
-/* 省电模式下简化图标 */
-[data-power-save="true"] .platform-card .w-12.h-12 {
-  background: #3d5350 !important;
-  border-radius: 8px !important;
-}
-
-/* 省电模式下移除所有渐变（横幅和切换按钮以及渐变文字除外） */
-[data-power-save="true"] .bg-gradient-to-br:not(.power-save-banner):not(.power-save-toggle):not(.bg-clip-text),
-[data-power-save="true"] .bg-gradient-to-r:not(.power-save-banner):not(.power-save-toggle):not(.bg-clip-text),
-[data-power-save="true"] [style*="gradient"]:not(.power-save-banner):not(.power-save-toggle):not(.bg-clip-text) {
-  background: #243634 !important;
-}
-
-/* 省电模式下渐变文字恢复为白色：移除渐变背景和裁剪，直接使用白色文字 */
-[data-power-save="true"] .bg-clip-text {
-  -webkit-background-clip: initial !important;
-  background-clip: initial !important;
-  color: white !important;
-  background: none !important;
 }

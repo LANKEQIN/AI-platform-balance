@@ -86,23 +86,23 @@ const GroupManagerModal: React.FC<GroupManagerModalProps> = ({
     >
       <div className="space-y-4">
         {/* 添加/编辑分组表单 */}
-        <div className="glass rounded-xl p-4">
-          <h3 className="text-white font-medium mb-3">
+        <div className="surface rounded-xl p-4">
+          <h3 className="text-primary font-medium mb-3">
             {editingGroupId ? '编辑分组' : '添加新分组'}
           </h3>
           <div className="space-y-3">
             <div>
-              <label className="text-white/70 text-sm mb-1 block">分组名称</label>
+              <label className="text-secondary text-sm mb-1 block">分组名称</label>
               <input
                 type="text"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 placeholder="输入分组名称"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:border-primary-400"
+                className="w-full bg-[var(--bg-surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-primary placeholder:text-[var(--text-muted)] focus:outline-none focus:border-primary-500"
               />
             </div>
             <div>
-              <label className="text-white/70 text-sm mb-1 block">分组图标</label>
+              <label className="text-secondary text-sm mb-1 block">分组图标</label>
               <div className="flex gap-2 flex-wrap">
                 {iconOptions.map((icon) => (
                   <button
@@ -110,8 +110,8 @@ const GroupManagerModal: React.FC<GroupManagerModalProps> = ({
                     onClick={() => setGroupIcon(icon)}
                     className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all ${
                       groupIcon === icon
-                        ? 'bg-primary-500 ring-2 ring-white/30'
-                        : 'bg-white/10 hover:bg-white/20'
+                        ? 'bg-primary-500 ring-2 ring-primary-500/30'
+                        : 'bg-[var(--bg-surface-hover)] hover:bg-[var(--border)]'
                     }`}
                   >
                     {icon}
@@ -124,13 +124,13 @@ const GroupManagerModal: React.FC<GroupManagerModalProps> = ({
                 <>
                   <button
                     onClick={handleSaveEdit}
-                    className="flex-1 btn bg-gradient-to-br from-primary-500 to-primary-400 text-white"
+                    className="flex-1 btn btn-primary"
                   >
                     保存
                   </button>
                   <button
                     onClick={handleCancelEdit}
-                    className="btn glass glass-hover"
+                    className="btn btn-secondary"
                   >
                     取消
                   </button>
@@ -138,7 +138,7 @@ const GroupManagerModal: React.FC<GroupManagerModalProps> = ({
               ) : (
                 <button
                   onClick={handleAddGroup}
-                  className="flex-1 btn bg-gradient-to-br from-green-500 to-emerald-400 text-white"
+                  className="flex-1 btn btn-primary"
                 >
                   添加分组
                 </button>
@@ -149,26 +149,26 @@ const GroupManagerModal: React.FC<GroupManagerModalProps> = ({
 
         {/* 分组列表 */}
         <div>
-          <h3 className="text-white font-medium mb-3">现有分组</h3>
+          <h3 className="text-primary font-medium mb-3">现有分组</h3>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {groups.map((group) => (
               <div
                 key={group.id}
-                className="glass rounded-lg p-3 flex items-center justify-between"
+                className="surface rounded-lg p-3 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{group.icon}</span>
-                  <span className="text-white font-medium">
+                  <span className="text-primary font-medium">
                     {group.name}
                     {group.id === 'default' && (
-                      <span className="text-xs text-white/50 ml-2">(默认)</span>
+                      <span className="text-xs text-muted ml-2">(默认)</span>
                     )}
                   </span>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEditGroup(group)}
-                    className="w-8 h-8 rounded-lg glass glass-hover flex items-center justify-center text-white/70 hover:text-white"
+                    className="w-8 h-8 rounded-lg surface flex items-center justify-center text-secondary hover:text-primary"
                     aria-label="编辑分组"
                   >
                     ✏️
@@ -176,7 +176,7 @@ const GroupManagerModal: React.FC<GroupManagerModalProps> = ({
                   {group.id !== 'default' && (
                     <button
                       onClick={() => handleDeleteGroup(group.id)}
-                      className="w-8 h-8 rounded-lg bg-red-500/20 hover:bg-red-500/40 flex items-center justify-center text-red-400 hover:text-red-300"
+                      className="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center text-red-500"
                       aria-label="删除分组"
                     >
                       🗑️

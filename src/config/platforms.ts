@@ -261,5 +261,15 @@ export const DEFAULT_PLATFORMS: Platform[] = [
     enabled: true,
     sortOrder: 25,
     groupId: 'default'
+  },
+  {
+    id: 'yuanjing-maas',
+    name: '元景大模型MaaS平台',
+    category: '云服务商',
+    url: 'https://maas.ai-yuanjing.com/aibase/home',
+    icon: '🔮',
+    enabled: true,
+    sortOrder: 26,
+    groupId: 'default'
   }
 ];

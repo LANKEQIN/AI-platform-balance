@@ -32,9 +32,9 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
   return (
     <div
       className={`
-        platform-card relative glass rounded-2xl p-6 shadow-lg
+        platform-card relative surface surface-hover rounded-xl p-6
         ${isStarred ? 'border-amber-400/60' : ''}
-        ${isSelected ? 'ring-2 ring-primary-500 ring-offset-2 ring-offset-transparent' : ''}
+        ${isSelected ? 'outline outline-2 outline-primary-500' : ''}
         ${viewMode === 'list' ? 'flex items-center gap-4' : 'flex flex-col'}
       `}
     >
@@ -47,7 +47,7 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
             transition-all duration-150
             ${isSelected 
               ? 'bg-primary-500 border-primary-500 text-white scale-110' 
-              : 'bg-white/10 border-white/30 hover:bg-white/20 hover:scale-105'
+              : 'bg-[var(--bg-surface)] border-[var(--border-strong)] hover:border-primary-500'
             }
           `}
           aria-label={isSelected ? '取消选择' : '选择平台'}
@@ -79,15 +79,15 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
         ${viewMode === 'list' ? 'mb-0 w-48 flex-shrink-0' : ''}
       `}>
         <div 
-          className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/15 to-white/5 flex items-center justify-center text-2xl shadow-sm flex-shrink-0"
+          className="w-12 h-12 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center text-2xl flex-shrink-0"
         >
           {platform.icon}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-bold text-white truncate">
+          <h3 className="text-lg font-bold text-primary truncate">
             {platform.name}
           </h3>
-          <span className="text-xs text-white/70 bg-primary-500/25 px-2 py-0.5 rounded-full font-medium inline-block">
+          <span className="text-xs text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-500/10 px-2 py-0.5 rounded-full font-medium inline-block">
             {platform.category}
           </span>
         </div>
@@ -98,13 +98,13 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
         flex-1 mb-4 relative z-1 min-w-0
         ${viewMode === 'list' ? 'mb-0 flex-1 mx-4' : ''}
       `}>
-        <p className="text-xs text-white/60 break-all line-clamp-2 transition-all duration-300 hover:text-white/80 mb-2">
+        <p className="text-xs text-muted break-all line-clamp-2 transition-all duration-300 hover:text-secondary mb-2">
           {displayUrl}
         </p>
         {/* 备注区域 */}
         {platform.note && (
-          <div className="mt-2 p-2 rounded-lg bg-white/5 border border-white/10">
-            <p className="text-xs text-white/70 line-clamp-3">
+          <div className="mt-2 p-2 rounded-lg bg-[var(--accent-soft)] border border-[var(--border)]">
+            <p className="text-xs text-secondary line-clamp-3">
               📝 {platform.note}
             </p>
           </div>
@@ -118,14 +118,14 @@ const PlatformCard: React.FC<PlatformCardProps> = ({
       `}>
         <button
           onClick={() => onGo(displayUrl)}
-          className="flex-1 btn bg-gradient-to-br from-green-500 to-emerald-400 text-white border-none shadow-[0_4px_15px_rgba(16,185,129,0.4)]"
+          className="flex-1 btn btn-primary"
           aria-label={`访问 ${platform.name}`}
         >
           访问
         </button>
         <button
           onClick={() => onEdit(platform)}
-          className="btn glass glass-hover"
+          className="btn btn-secondary"
           aria-label={`编辑 ${platform.name}`}
         >
           编辑

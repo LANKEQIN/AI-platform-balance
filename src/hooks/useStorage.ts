@@ -122,7 +122,6 @@ export function useStorage() {
     localStorage.removeItem(STORAGE_KEYS.GROUPS_CONFIG);
     localStorage.removeItem(STORAGE_KEYS.THEME);
     localStorage.removeItem(STORAGE_KEYS.VIEW_MODE);
-    localStorage.removeItem(STORAGE_KEYS.EFFECTS_MODE);
     localStorage.removeItem(STORAGE_KEYS.POWER_SAVE);
     localStorage.setItem(STORAGE_KEYS.CONFIG_VERSION, String(CONFIG_VERSION));
     return JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
@@ -135,15 +134,6 @@ export function useStorage() {
 
   const saveViewMode = useCallback((mode: 'grid' | 'list'): void => {
     localStorage.setItem(STORAGE_KEYS.VIEW_MODE, mode);
-  }, []);
-
-  const getEffectsMode = useCallback((): 'cool' | 'simple' => {
-    const value = localStorage.getItem(STORAGE_KEYS.EFFECTS_MODE);
-    return value === 'cool' ? 'cool' : 'simple';
-  }, []);
-
-  const saveEffectsMode = useCallback((mode: 'cool' | 'simple'): void => {
-    localStorage.setItem(STORAGE_KEYS.EFFECTS_MODE, mode);
   }, []);
 
   /**
@@ -248,13 +238,12 @@ export function useStorage() {
       groups: getGroups(),
       theme: getTheme(),
       viewMode: getViewMode(),
-      effectsMode: getEffectsMode(),
       powerSave: getPowerSave(),
       exportTime: new Date().toISOString(),
       version: CONFIG_VERSION
     };
     return JSON.stringify(config, null, 2);
-  }, [getPlatforms, getGroups, getTheme, getViewMode, getEffectsMode, getPowerSave]);
+  }, [getPlatforms, getGroups, getTheme, getViewMode, getPowerSave]);
 
   const validateImportConfig = useCallback((config: any): { valid: boolean; message: string; data: any } => {
     if (!config || typeof config !== 'object') {
@@ -349,10 +338,6 @@ export function useStorage() {
       if (config.viewMode === 'grid' || config.viewMode === 'list') {
         saveViewMode(config.viewMode);
       }
-      if (config.effectsMode === 'cool' || config.effectsMode === 'simple') {
-        saveEffectsMode(config.effectsMode);
-      }
-
       // 导入省电模式状态
       if (typeof config.powerSave === 'boolean') {
         savePowerSave(config.powerSave);
@@ -368,7 +353,6 @@ export function useStorage() {
           groupsCount: config.groups?.length || 0,
           theme: config.theme || 'light',
           viewMode: config.viewMode || 'grid',
-          effectsMode: config.effectsMode || 'simple',
           powerSave: config.powerSave || false
         }
       };
@@ -383,7 +367,7 @@ export function useStorage() {
       console.error('导入配置失败:', error);
       return { success: false, message: errorMessage };
     }
-  }, [savePlatforms, saveGroups, saveTheme, saveViewMode, saveEffectsMode, savePowerSave, validateImportConfig]);
+  }, [savePlatforms, saveGroups, saveTheme, saveViewMode, savePowerSave, validateImportConfig]);
 
   // 使用 useMemo 保持返回对象的引用稳定，避免无限循环
   return useMemo(() => ({
@@ -398,8 +382,6 @@ export function useStorage() {
     importConfig,
     getHasVisited,
     setHasVisited,
-    getEffectsMode,
-    saveEffectsMode,
     getPowerSave,
     savePowerSave,
     // 分组相关
@@ -420,8 +402,6 @@ export function useStorage() {
     importConfig,
     getHasVisited,
     setHasVisited,
-    getEffectsMode,
-    saveEffectsMode,
     getPowerSave,
     savePowerSave,
     getGroups,

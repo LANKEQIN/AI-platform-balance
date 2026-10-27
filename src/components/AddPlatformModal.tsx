@@ -68,8 +68,8 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, gr
       <div className="space-y-4">
         {/* 平台名称 */}
         <div>
-          <label htmlFor="addName" className="block mb-1 text-sm font-semibold text-white">
-            平台名称 <span className="text-pink-500">*</span>
+          <label htmlFor="addName" className="block mb-1 text-sm font-semibold text-primary">
+            平台名称 <span className="text-red-500">*</span>
           </label>
           <input
             id="addName"
@@ -86,8 +86,8 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, gr
 
         {/* 余额页面链接 */}
         <div>
-          <label htmlFor="addUrl" className="block mb-1 text-sm font-semibold text-white">
-            余额页面链接 <span className="text-pink-500">*</span>
+          <label htmlFor="addUrl" className="block mb-1 text-sm font-semibold text-primary">
+            余额页面链接 <span className="text-red-500">*</span>
           </label>
           <input
             id="addUrl"
@@ -110,7 +110,7 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, gr
 
         {/* 分类 */}
         <div>
-          <label htmlFor="addCategory" className="block mb-1 text-sm font-semibold text-white">
+          <label htmlFor="addCategory" className="block mb-1 text-sm font-semibold text-primary">
             分类
           </label>
           <select
@@ -129,7 +129,7 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, gr
 
         {/* 分组 */}
         <div>
-          <label htmlFor="addGroup" className="block mb-1 text-sm font-semibold text-white">
+          <label htmlFor="addGroup" className="block mb-1 text-sm font-semibold text-primary">
             分组
           </label>
           <select
@@ -148,7 +148,7 @@ const AddPlatformModal: React.FC<AddPlatformModalProps> = ({ isOpen, onClose, gr
 
         {/* 备注 */}
         <div>
-          <label htmlFor="addNote" className="block mb-1 text-sm font-semibold text-white">
+          <label htmlFor="addNote" className="block mb-1 text-sm font-semibold text-primary">
             备注
           </label>
           <textarea

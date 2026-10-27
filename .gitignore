@@ -62,3 +62,6 @@ release/
 *.sw?
 start-dev.bat
 docs/依赖版本更新计划.md
+
+# 头脑风暴可视化伴侣（设计稿临时文件）
+.superpowers/

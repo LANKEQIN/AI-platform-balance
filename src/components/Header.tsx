@@ -73,10 +73,9 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="glass backdrop-blur-xl py-4 px-6 shadow-md border-b border-white/20 sticky top-0 z-[100] flex justify-between items-center flex-wrap gap-4 transition-all duration-250">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+    <header className="bg-[var(--bg-surface)] py-4 px-6 border-b border-[var(--border)] sticky top-0 z-[100] flex justify-between items-center flex-wrap gap-4">
 
-      <h1 className="text-2xl font-bold bg-gradient-to-br from-white via-indigo-100 to-indigo-200 bg-clip-text text-transparent">
+      <h1 className="text-2xl font-bold text-primary tracking-tight">
         AI平台余额快捷入口
       </h1>
 
@@ -86,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({
           <input
             id="searchInput"
             type="text"
-            className="pl-4 pr-10 py-2 border border-white/20 rounded-2xl glass backdrop-blur-lg text-white text-sm w-56 transition-all duration-250 shadow-sm focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/25 focus:bg-white/18"
+            className="pl-4 pr-10 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg-surface)] text-primary text-sm w-56 transition-colors placeholder:text-[var(--text-muted)] focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
             placeholder="搜索平台... (Ctrl+K)"
             value={searchKeyword}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -94,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({
           />
           {searchKeyword && (
             <button
-              className="absolute right-2.5 w-11 h-11 border-none bg-transparent text-white/60 text-lg leading-none cursor-pointer opacity-100 transition-all duration-150 flex items-center justify-center rounded"
+              className="absolute right-2.5 w-11 h-11 border-none bg-transparent text-muted text-lg leading-none cursor-pointer opacity-100 transition-all duration-150 flex items-center justify-center rounded"
               onClick={handleClearSearch}
               aria-label="清空搜索"
             >
@@ -147,12 +146,12 @@ const Header: React.FC<HeaderProps> = ({
           </button>
           {showDropdown && (
             <div
-              className="absolute right-0 top-full mt-2 glass backdrop-blur-xl rounded-xl shadow-lg border border-white/20 min-w-40 overflow-hidden z-[200]"
+              className="absolute right-0 top-full mt-2 surface rounded-lg min-w-40 overflow-hidden z-[200]"
               role="menu"
               aria-label="更多操作菜单"
             >
               <button
-                className="w-full px-4 py-3 text-left text-white/90 hover:bg-white/10 transition-colors"
+                className="w-full px-4 py-3 text-left text-primary hover:bg-[var(--bg-surface-hover)] transition-colors"
                 role="menuitem"
                 onClick={() => {
                   onExport();
@@ -162,14 +161,14 @@ const Header: React.FC<HeaderProps> = ({
                 导出配置
               </button>
               <button
-                className="w-full px-4 py-3 text-left text-white/90 hover:bg-white/10 transition-colors"
+                className="w-full px-4 py-3 text-left text-primary hover:bg-[var(--bg-surface-hover)] transition-colors"
                 role="menuitem"
                 onClick={handleImportClick}
               >
                 导入配置
               </button>
               <button
-                className="w-full px-4 py-3 text-left text-red-400 hover:bg-white/10 transition-colors"
+                className="w-full px-4 py-3 text-left text-red-500 hover:bg-[var(--bg-surface-hover)] transition-colors"
                 role="menuitem"
                 onClick={() => {
                   onReset();
@@ -184,7 +183,7 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* 极致省电模式切换按钮（使用 power-save-toggle 类名，确保省电模式下样式不被覆盖） */}
         <button
-          className={`btn btn-icon power-save-toggle ${isPowerSave ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none' : ''}`}
+          className={`btn btn-icon power-save-toggle ${isPowerSave ? 'bg-amber-active bg-amber-500 border-amber-500 text-white' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();

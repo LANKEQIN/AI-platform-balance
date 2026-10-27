@@ -21,7 +21,6 @@ import BatchToolbar from './components/BatchToolbar';
 import ToastContainer from './components/ToastContainer';
 import Footer from './components/Footer';
 import LandingPage from './components/LandingPage';
-import VisualEffects from './components/VisualEffects';
 
 const getGridClassName = (viewMode: 'grid' | 'list') => {
   return viewMode === 'grid'
@@ -415,9 +414,6 @@ function App() {
       <div className="power-save-banner">
         🔋 极致省电模式已启用 - 性能优先
       </div>
-
-      {/* 视觉特效组件 - 省电模式下不渲染以节省性能 */}
-      {!isPowerSave && <VisualEffects />}
 
       {/* 头部 */}
       <Header

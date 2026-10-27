@@ -137,7 +137,7 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
       <div className="space-y-4">
         {/* 平台名称 */}
         <div>
-          <label htmlFor="editName" className="block mb-1 text-sm font-semibold text-white">
+          <label htmlFor="editName" className="block mb-1 text-sm font-semibold text-primary">
             平台名称
           </label>
           <input
@@ -153,7 +153,7 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
 
         {/* 余额页面链接 */}
         <div>
-          <label htmlFor="editUrl" className="block mb-1 text-sm font-semibold text-white">
+          <label htmlFor="editUrl" className="block mb-1 text-sm font-semibold text-primary">
             余额页面链接
           </label>
           <input
@@ -172,15 +172,15 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
             </p>
           )}
           {platform && (
-            <p className="text-xs text-white/60 mt-1">
-              默认链接: <span className="text-white/80">{platform.url}</span>
+            <p className="text-xs text-muted mt-1">
+              默认链接: <span className="text-secondary">{platform.url}</span>
             </p>
           )}
         </div>
 
         {/* 分类 */}
         <div>
-          <label htmlFor="editCategory" className="block mb-1 text-sm font-semibold text-white">
+          <label htmlFor="editCategory" className="block mb-1 text-sm font-semibold text-primary">
             分类
           </label>
           <select
@@ -199,7 +199,7 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
 
         {/* 分组 */}
         <div>
-          <label htmlFor="editGroup" className="block mb-1 text-sm font-semibold text-white">
+          <label htmlFor="editGroup" className="block mb-1 text-sm font-semibold text-primary">
             分组
           </label>
           <select
@@ -223,15 +223,15 @@ const EditPlatformModal: React.FC<EditPlatformModalProps> = ({
               type="checkbox"
               checked={starred}
               onChange={(e) => setStarred(e.target.checked)}
-              className="w-4 h-4 rounded border-white/30 bg-white/10"
+              className="w-4 h-4 rounded border-[var(--border-strong)] bg-[var(--bg-surface)] accent-primary-500"
             />
-            <span className="text-white">收藏此平台</span>
+            <span className="text-primary">收藏此平台</span>
           </label>
         </div>
 
         {/* 备注 */}
         <div>
-          <label htmlFor="editNote" className="block mb-1 text-sm font-semibold text-white">
+          <label htmlFor="editNote" className="block mb-1 text-sm font-semibold text-primary">
             备注
           </label>
           <textarea

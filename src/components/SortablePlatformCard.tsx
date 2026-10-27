@@ -98,7 +98,7 @@ const SortablePlatformCard: React.FC<SortablePlatformCardProps> = ({
             {...attributes}
             {...listeners}
           >
-            <span className="text-white/70 select-none">⋮⋮</span>
+            <span className="text-muted select-none">⋮⋮</span>
           </button>
         )}
         <PlatformCard

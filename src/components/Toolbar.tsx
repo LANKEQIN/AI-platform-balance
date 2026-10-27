@@ -13,10 +13,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
   currentCategory,
   onCategoryChange,
   viewMode,
-  onViewModeChange,
-  theme
+  onViewModeChange
 }) => {
-  const isDark = theme === 'dark';
   // 获取有效的分类（排除 'all'）
   const validCategories = CATEGORIES.filter(c => c.id !== 'all' && c.id !== 'starred');
 
@@ -27,14 +25,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <div className="flex gap-2 flex-wrap" role="tablist" aria-label="平台分类筛选">
           {/* 全部标签 */}
           <button
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
               currentCategory === 'all'
-                ? (isDark
-                    ? 'bg-white/92 border-white/40 text-teal-800 shadow-[0_4px_20px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.2)]'
-                    : 'bg-white text-gray-900 border-transparent shadow-md')
-                : (isDark
-                    ? 'glass glass-hover text-white/70'
-                    : 'bg-white/30 hover:bg-white/50 text-gray-800 border-white/30')
+                ? 'bg-primary-600 border-primary-600 text-white'
+                : 'surface text-secondary hover:text-primary'
             }`}
             data-category="all"
             role="tab"
@@ -48,14 +42,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
           {validCategories.map((category) => (
             <button
               key={category.id}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
                 currentCategory === category.id
-                  ? (isDark
-                      ? 'bg-white/92 border-white/40 text-teal-800 shadow-[0_4px_20px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.2)]'
-                      : 'bg-white text-gray-900 border-transparent shadow-md')
-                  : (isDark
-                      ? 'glass glass-hover text-white/70'
-                      : 'bg-white/30 hover:bg-white/50 text-gray-800 border-white/30')
+                  ? 'bg-primary-600 border-primary-600 text-white'
+                  : 'surface text-secondary hover:text-primary'
               }`}
               data-category={category.id}
               role="tab"
@@ -68,14 +58,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
           {/* 已收藏标签 */}
           <button
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
               currentCategory === 'starred'
-                ? (isDark
-                    ? 'bg-white/92 border-white/40 text-teal-800 shadow-[0_4px_20px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.2)]'
-                    : 'bg-white text-gray-900 border-transparent shadow-md')
-                : (isDark
-                    ? 'glass glass-hover text-white/70'
-                    : 'bg-white/30 hover:bg-white/50 text-gray-800 border-white/30')
+                ? 'bg-primary-600 border-primary-600 text-white'
+                : 'surface text-secondary hover:text-primary'
             }`}
             data-category="starred"
             role="tab"
@@ -89,10 +75,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
         {/* 视图切换 */}
         <div className="flex gap-1" role="group" aria-label="视图切换">
           <button
-            className={`w-11 h-11 rounded-lg transition-all duration-200 ${
-              viewMode === 'grid' 
-                ? (isDark ? 'bg-white/20 text-white glass' : 'bg-white text-gray-900 shadow-md') 
-                : (isDark ? 'glass text-white/70 hover:text-white' : 'bg-white/30 text-gray-700 hover:bg-white/50 hover:text-gray-900')
+            className={`w-11 h-11 rounded-lg transition-colors border flex items-center justify-center ${
+              viewMode === 'grid'
+                ? 'bg-primary-600 border-primary-600 text-white'
+                : 'surface text-secondary hover:text-primary'
             }`}
             data-view="grid"
             title="卡片视图"
@@ -103,10 +89,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
             ▦
           </button>
           <button
-            className={`w-11 h-11 rounded-lg transition-all duration-200 ${
-              viewMode === 'list' 
-                ? (isDark ? 'bg-white/20 text-white glass' : 'bg-white text-gray-900 shadow-md') 
-                : (isDark ? 'glass text-white/70 hover:text-white' : 'bg-white/30 text-gray-700 hover:bg-white/50 hover:text-gray-900')
+            className={`w-11 h-11 rounded-lg transition-colors border flex items-center justify-center ${
+              viewMode === 'list'
+                ? 'bg-primary-600 border-primary-600 text-white'
+                : 'surface text-secondary hover:text-primary'
             }`}
             data-view="list"
             title="列表视图"

@@ -28,7 +28,6 @@ export const STORAGE_KEYS = {
   THEME: 'ai_platforms_theme',
   CONFIG_VERSION: 'ai_platforms_config_version',
   VIEW_MODE: 'ai_platforms_view_mode',
-  EFFECTS_MODE: 'ai_platforms_effects_mode',
   SELECTED_IDS: 'ai_platforms_selected_ids',
   HAS_VISITED: 'ai_platforms_has_visited',
   GROUPS_CONFIG: 'ai_platforms_groups', // 新增分组存储键

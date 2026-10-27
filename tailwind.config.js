@@ -4,25 +4,23 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: ['attribute', 'data-theme'],
+  // 暗色主题跟随 data-theme 属性（v3.4 合法策略：selector）
+  darkMode: ['selector', '[data-theme="dark"]'],
   theme: {
     extend: {
       colors: {
+        // 品牌青色板（与 index.css 的 --accent tokens 一致）
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-        },
-        accent: {
-          500: '#ec4899',
-          600: '#db2777',
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6',
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
         },
         success: {
           500: '#10b981',
@@ -38,22 +36,10 @@ export default {
         },
       },
       animation: {
-        'gradient-shift': 'gradientShift 15s ease infinite',
-        'aurora-move': 'auroraMove 20s ease-in-out infinite alternate',
         'card-float-in': 'cardFloatIn 0.4s ease backwards',
         'modal-slide-in': 'modalSlideIn 0.25s ease forwards',
       },
       keyframes: {
-        gradientShift: {
-          '0%, 100%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
-        },
-        auroraMove: {
-          '0%': { transform: 'translateX(0) translateY(0) rotate(0deg)' },
-          '33%': { transform: 'translateX(30px) translateY(-30px) rotate(5deg)' },
-          '66%': { transform: 'translateX(-20px) translateY(20px) rotate(-5deg)' },
-          '100%': { transform: 'translateX(0) translateY(0) rotate(0deg)' },
-        },
         cardFloatIn: {
           from: { opacity: '0', transform: 'translateY(20px)' },
           to: { opacity: '1', transform: 'translateY(0)' },

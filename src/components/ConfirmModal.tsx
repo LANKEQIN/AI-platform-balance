@@ -46,7 +46,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         </>
       }
     >
-      <div className="text-white/90">
+      <div className="text-primary">
         <p className="whitespace-pre-line">{message}</p>
       </div>
     </Modal>
